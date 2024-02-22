@@ -9,20 +9,26 @@ const tasksSlice = createSlice({
   },
   reducers: {
     setTasks: (state, action) => {
-      // action.payload should be an object with task_id as keys
-      state.tasks_obj = action.payload;
+      // Run whenever we are retrieving all tasks from database and storing them in local state
+      const new_tasks_obj = action.payload;
+      state.tasks_obj = new_tasks_obj;
       state.loading = false;
     },
     addTask: (state, action) => {
-      const newTask = action.payload;
-      state.tasks_obj[newTask.task_id] = newTask;
+      const { title, description, local_temp_id } = action.payload;
+      state.tasks_obj[local_temp_id] = { local_temp_id, title, description };
     },
     updateTask: (state, action) => {
-      const { task_id, title, description } = action.payload;
-      const existingTask = state.tasks_obj[task_id];
-      if (existingTask) {
-        existingTask.title = title;
-        existingTask.description = description;
+      const { task_id, title, description, created_at, local_temp_id } = action.payload;
+      // Updating older task
+      if(state.tasks_obj[task_id]) { // Existing tasks with task_id created by external database
+        state.tasks_obj[task_id] = { task_id, title, description, created_at };
+      }
+
+      // Updating newer task with final values from database confirmation
+      if(state.tasks_obj[local_temp_id]) { // New tasks with local_temp_id created by local state
+        delete state.tasks_obj[local_temp_id];
+        state.tasks_obj[task_id] = { task_id, title, description, created_at };
       }
     },
     deleteTask: (state, action) => {

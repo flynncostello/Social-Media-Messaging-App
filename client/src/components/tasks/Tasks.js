@@ -1,8 +1,14 @@
-// Tasks.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTasksAsync, addTaskAsync, updateTaskAsync, deleteTaskAsync, getTaskByIdAsync } from './taskActions';
+import { fetchTasksAsync, addTaskAsync, deleteTaskAsync } from './taskActions';
 import { selectTasks } from './tasksSlice';
+import { v4 as uuidv4 } from 'uuid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
+function generateTemporaryId() {
+  return `local_${uuidv4()}`;
+}
 
 const Tasks = () => {
   const dispatch = useDispatch();
@@ -11,40 +17,46 @@ const Tasks = () => {
 
   useEffect(() => {
     // Fetch tasks when the component mounts
+    console.log("GETTING TASKS");
     dispatch(fetchTasksAsync());
   }, [dispatch]);
 
-  const handleAddTask = () => {
-    // Example of adding a new task
+  const handleAddTask = (title, description) => {
     const newTask = {
-      task_id: '2', // Replace with an actual ID from your backend
-      title: 'New Task',
-      description: 'This is a new task',
-      created_at: '2024-02-21',
+      title,
+      description,
+      local_temp_id: generateTemporaryId(),
     };
     dispatch(addTaskAsync(newTask));
+    //console.log("STATE AFTER ADD, ", tasksState.tasks_obj)
   };
 
-  const handleUpdateTask = () => {
-    // Example of updating an existing task
-    const updatedTask = {
-      task_id: '1', // Replace with an actual ID from your backend
-      title: 'Updated Task',
-      description: 'This task has been updated',
-    };
-    dispatch(updateTaskAsync(updatedTask));
-  };
-
-  const handleDeleteTask = () => {
-    // Example of deleting an existing task
-    const taskIdToDelete = '1'; // Replace with an actual ID from your backend
+  const handleDeleteTask = (task) => {
+    const taskIdToDelete = task.task_id || task.local_temp_id;
+    console.log("ID TO DELETE ", taskIdToDelete);
     dispatch(deleteTaskAsync(taskIdToDelete));
+    console.log("STATE AFTER DELETE, ", tasksState.tasks_obj)
   };
 
-  const handleGetTaskById = () => {
-    // Example of fetching a task by ID
-    const taskIdToFetch = '1'; // Replace with an actual ID from your backend
-    dispatch(getTaskByIdAsync(taskIdToFetch));
+  // State for the new task form
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+
+  const handleTitleChange = (e) => {
+    setNewTaskTitle(e.target.value);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setNewTaskDescription(e.target.value);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    // Call the function to handle task creation with the provided title and description
+    handleAddTask(newTaskTitle, newTaskDescription);
+    // Clear the form fields after submission
+    setNewTaskTitle('');
+    setNewTaskDescription('');
   };
 
   return (
@@ -53,15 +65,36 @@ const Tasks = () => {
       {loading && <p>Loading...</p>}
       <ul>
         {Object.values(tasks_obj).map((task) => (
-          <li key={task.task_id}>
-            <strong>{task.title}</strong>: {task.description}
-          </li>
+            <li key={task.task_id || task.local_temp_id}>
+                <strong>{task.title}</strong>: {task.description}
+                <button className="delete-button" onClick={() => handleDeleteTask(task)}>
+                    <FontAwesomeIcon icon={faTimes} /> {/* Use FontAwesome "times" (X) icon */}
+                </button>
+            </li>
         ))}
       </ul>
-      <button onClick={handleAddTask}>Add Task</button>
-      <button onClick={handleUpdateTask}>Update Task</button>
-      <button onClick={handleDeleteTask}>Delete Task</button>
-      <button onClick={handleGetTaskById}>Get Task by ID</button>
+      <h2>Create New Task</h2>
+      <form onSubmit={handleFormSubmit}>
+        <label htmlFor="newTaskTitle">Title:</label>
+        <input
+          type="text"
+          id="newTaskTitle"
+          value={newTaskTitle}
+          onChange={handleTitleChange}
+          required
+        />
+        <br />
+        <label htmlFor="newTaskDescription">Description:</label>
+        <input
+          type="text"
+          id="newTaskDescription"
+          value={newTaskDescription}
+          onChange={handleDescriptionChange}
+          required
+        />
+        <br />
+        <button type="submit">Create Task</button>
+      </form>
     </div>
   );
 };

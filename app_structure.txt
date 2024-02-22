@@ -9,6 +9,9 @@ my-app/
         public/
             index.html
         src/
+            api/
+                index.js <-- Has base route to api
+                tasks.js <-- Api for getting route information from endpoints created in backend which link to database requests
             store/
                 rootReducer.js <-- Combines all reducers
                 store.js <-- Configures and creates store
@@ -18,6 +21,13 @@ my-app/
                         Home.js <-- Returns html, uses controllers
                         Home.css
                         homeSlice.js
+                    tasks/
+                        Task.js <-- Main html file for indidual task
+                        Task.css <-- Css for individual task
+                        Tasks.js <-- Main html file for all tasks structure
+                        Tasks.css <-- Css for tasks.js
+                        tasksSlice.js <-- Manages state of all tasks
+                        taskActions.js <-- Performs different actions influecing tasks state
                     about/                    
                         About.js
                         About.css
@@ -30,6 +40,7 @@ my-app/
             App.js <-- Defines all routes and components to be called on each route
             index.js
             App.css
+            routes.js <-- Sets up all routes in front-end which client can access
         package.json <-- cd client, npm start, to run client side
         package-lock.json
         .gitignore
@@ -73,3 +84,9 @@ Setting up Git Repo:
 6) git commit -m "app shell"
 7) git push -u origin main
 */
+
+
+Quick Fixes for Common Issues
+- If you get issue to do with React Hooks and useRef its
+due to multiple versions of React so just run,
+npm link client/node_modules/react

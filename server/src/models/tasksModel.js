@@ -4,6 +4,7 @@ const tasksModel = {
     getAllTasks: async () => {
         try {
             const { data } = await supabase.from("tasks").select("*");
+            //console.log("DATA IN SERVER MODEL, ", data)
             return data;
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -27,11 +28,11 @@ const tasksModel = {
     },
 
     createTask: async (task_info) => {
-        const { title, description } = task_info;
+        const { title, description, local_temp_id } = task_info;
         try {
             const { data, error } = await supabase
                 .from("tasks")
-                .insert([{ title, description }])
+                .insert([{ title, description, local_temp_id }])
                 .select();
             
             if (error) {
