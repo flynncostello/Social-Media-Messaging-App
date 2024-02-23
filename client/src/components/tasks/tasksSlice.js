@@ -12,6 +12,7 @@ const tasksSlice = createSlice({
       // Run whenever we are retrieving all tasks from database and storing them in local state
       const new_tasks_obj = action.payload;
       state.tasks_obj = new_tasks_obj;
+      console.log("STATE TASKS OBJ, ", state.tasks_obj);
       state.loading = false;
     },
     addTask: (state, action) => {

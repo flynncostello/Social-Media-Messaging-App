@@ -1,3 +1,9 @@
+/*
+From the root directory run:
+- npm start --> quick start
+- npm run build --> to create deployable build
+*/
+
 my-app/
     client/
         /*

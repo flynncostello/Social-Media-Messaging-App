@@ -28,6 +28,7 @@ export const fetchTasksAsync = () => async (dispatch) => {
         const response = await tasksAPI.getTasks();
         if (response.status === 200) {
             const tasks_obj = createObjectFromArray(response.data, 'task_id');
+            //console.log('Tasks fetched:', tasks_obj);
             dispatch(setTasks(tasks_obj)); // Altering state of tasks in slice
         } else {
             console.error('Fetch tasks failed', response.statusText);

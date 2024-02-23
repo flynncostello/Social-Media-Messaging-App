@@ -12,14 +12,14 @@ import { useDispatch } from 'react-redux';
 import { updateTaskAsync } from './taskActions';
 
 const Task = ({ task, handleDeleteTask }) => {
-    const { title, description } = task;
-    const [completed, setCompleted] = useState(false);
-    
+    const { title, description, completed } = task;
+    //const [completed, setCompleted] = useState(false);
+
     const dispatch = useDispatch();
 
     const handleCheckboxChange = (e) => {
         e.stopPropagation();
-        setCompleted(!completed);
+        //setCompleted(!completed);
         const updatedTask = { ...task, completed: !completed };
         dispatch(updateTaskAsync(task.task_id, updatedTask));
     };

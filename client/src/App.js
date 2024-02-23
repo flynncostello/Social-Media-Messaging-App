@@ -6,12 +6,14 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Tasks from './components/tasks/Tasks';
 import TaskPage from './components/tasks/TaskPage';
+import Home from './components/home/Home';
 
 export default function App() {
   return (
     <Provider store={store}>
       <Router>
         <Routes>
+          <Route path="/" element={<Home/>}/>
           <Route path="/tasks" element={<Tasks/>}/>
           <Route path="/tasks/:task_id" element={<TaskPage/>}/>
         </Routes>
