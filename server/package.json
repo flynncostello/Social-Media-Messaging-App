@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm install && npm install -g nodemon && nodemon src/server.js",
+    "start": "npm install && npm install -g nodemon && npm install @supabase/supabase-js && npm install express cors morgan && nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
