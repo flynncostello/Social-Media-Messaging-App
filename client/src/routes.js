@@ -1,8 +1,9 @@
+// routes.js
 const ROUTES = {
     root: () => "/",
     tasks: () => "/tasks",
-    taskRoute: () => `/tasks/${task_id}`
+    taskRoute: (task_id) => `/tasks/${task_id}`,
 };
-
+  
 export default ROUTES;
   

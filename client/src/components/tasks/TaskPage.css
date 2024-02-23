@@ -1,0 +1,186 @@
+/* TaskPage.css */
+
+.task-page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.back-button {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    color: #333; /* Adjust the color as needed */
+}
+
+.back-button i {
+    margin-right: 5px; /* Adjust the spacing between icon and text */
+}
+
+.back-button:hover {
+    font-size: 22px; /* Increase font size on hover */
+    color: #555; /* Change color on hover */
+}
+
+
+.task-details-container {
+    background-color: #f8f8f8;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.task-page-buttons {
+    display: flex;
+    gap: 20px;
+
+}
+
+/* Delete button */
+.delete-button {
+    display: inline-block;
+    transition: all 0.2s ease-in;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    color: #ffffff;
+    padding: 0.7em 1.7em;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 0.5em;
+    background: #ff8181;
+    border: 1px solid #ffffff;
+    box-shadow: 1px 1px 4px #c5c5c5, -6px -6px 12px #ffffff;
+  }
+  
+  .delete-button:active {
+    color: #666;
+    box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
+  }
+  
+  .delete-button:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.25);
+    top: 100%;
+    width: 140%;
+    height: 180%;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+  }
+  
+  .delete-button:after {
+    content: "";
+    position: absolute;
+    left: 55%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.45);
+    top: 180%;
+    width: 160%;
+    height: 190%;
+    background-color: #ff0000;
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+  }
+  
+  .delete-button:hover {
+    color: #ffffff;
+    border: 1px solid #ff0000;
+  }
+  
+  .delete-button:hover:before {
+    top: -35%;
+    background-color: #ff0000;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+  }
+  
+  .delete-button:hover:after {
+    top: -45%;
+    background-color: #ff0000;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+  }
+  
+
+
+
+
+
+  /* Edit button */
+.edit-button {
+    display: inline-block;
+    transition: all 0.2s ease-in;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    color: #ffffff;
+    padding: 0.7em 1.7em;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 0.5em;
+    background: #5fd4cc;
+    border: 1px solid #ffffff;
+    box-shadow: 1px 1px 4px #c5c5c5, -6px -6px 12px #ffffff;
+  }
+  
+  .edit-button:active {
+    color: #666;
+    box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
+  }
+  
+  .edit-button:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.25);
+    top: 100%;
+    width: 140%;
+    height: 180%;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+  }
+  
+  .edit-button:after {
+    content: "";
+    position: absolute;
+    left: 55%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.45);
+    top: 180%;
+    width: 160%;
+    height: 190%;
+    background-color: #27ebde;
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+  }
+  
+  .edit-button:hover {
+    color: #ffffff;
+    border: 1px solid #27ebde;
+  }
+  
+  .edit-button:hover:before {
+    top: -35%;
+    background-color: #27ebde;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+  }
+  
+  .edit-button:hover:after {
+    top: -45%;
+    background-color: #27ebde;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+  }

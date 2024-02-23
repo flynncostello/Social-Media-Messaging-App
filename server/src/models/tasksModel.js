@@ -50,12 +50,12 @@ const tasksModel = {
     },
 
     updateTask: async (task_id, updated_task_info) => {
-        const { title, description } = updated_task_info;
+        const { title, description, completed } = updated_task_info;
       
         try {
           const { data, error } = await supabase
             .from("tasks")
-            .update({ title, description })
+            .update({ title, description, completed })
             .match({ task_id })
             .select();
                   
