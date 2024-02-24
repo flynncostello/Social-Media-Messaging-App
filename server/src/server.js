@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/tasks", tasksRouter);
 
-const port = process.env.PORT || 10000; // Default to port 3000 if PORT is not defined
+const port = process.env.PORT || 5000; // Default to port 3000 if PORT is not defined
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

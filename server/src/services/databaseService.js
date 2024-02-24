@@ -2,11 +2,11 @@
 
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+const pool = new Pool({ // create connection to database
+  connectionString: process.env.DATABASE_URL,	// use DATABASE_URL environment variable from Render app 
   ssl: {
-    rejectUnauthorized: false, // Only set this to false in a development environment
-  },
+    rejectUnauthorized: false // don't check for SSL cert
+  }
 });
 
 module.exports = pool;
