@@ -23,6 +23,11 @@ app.listen(port, () => {
 });
 */
 
+app.get("*", (req, res) => {
+  // Serve the index.html from the client directory
+  res.sendFile(path.join(__dirname, "..", "..", "client", "public", "index.html"));
+});
+
 const port = process.env.PORT || 10000;
 
 // Bind the server to host 0.0.0.0 and the specified port
