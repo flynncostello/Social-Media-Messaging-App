@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/api/tasks", tasksRouter);
+app.use("https://full-stack-to-do-list-app.onrender.com/api/tasks", tasksRouter);
 
 /*
 const port = process.env.PORT || 5001;
