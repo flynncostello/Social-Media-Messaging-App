@@ -1,4 +1,4 @@
-const tasksModel = require('../models/tasksModel');
+const tasksModel = require('../models/supabaseTaskModel');
 
 exports.getAllTasks = async (req, res) => {
     try {

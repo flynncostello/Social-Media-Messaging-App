@@ -1,4 +1,4 @@
-const supabase = require('../services/databaseService');
+const supabase = require('../services/supabaseDatabaseService');
 
 const tasksModel = {
     getAllTasks: async () => {
