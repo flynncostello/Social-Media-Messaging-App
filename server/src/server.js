@@ -26,8 +26,8 @@ app.listen(port, () => {
 const port = process.env.PORT || 10000;
 
 // Bind the server to host 0.0.0.0 and the specified port
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Example app listening on http://0.0.0.0:${port}!`);
+app.listen(port => {
+  console.log(`App listening on ${port}!`);
 });
 
 module.exports = app;
