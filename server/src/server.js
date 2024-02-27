@@ -13,20 +13,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-//app.use("https://full-stack-to-do-list-app.onrender.com/api/tasks", tasksRouter);
-
+// app.use("https://full-stack-to-do-list-app.onrender.com/api/tasks", tasksRouter);
 app.use("/api/tasks", tasksRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'client', 'public', 'index.html'));
 });
 
-
+const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || 10000;
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}!`);
+app.listen(port, host, () => {
+  console.log(`App listening on http://${host}:${port}!`);
 });
-
 
 module.exports = app;
