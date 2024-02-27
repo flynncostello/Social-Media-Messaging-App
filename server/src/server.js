@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const logger = require("morgan");
-const path = require("path");
+//const path = require("path");
 
 const tasksRouter = require("./routes/tasksRouter");
 
@@ -11,7 +11,7 @@ app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
+//app.use(express.static(path.join(__dirname, "public")));
 
 // app.use("https://full-stack-to-do-list-app.onrender.com/api/tasks", tasksRouter);
 app.use("/api/tasks", tasksRouter);
