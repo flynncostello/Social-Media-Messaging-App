@@ -39,13 +39,15 @@ const TaskPage = () => {
     */
 
     // Handle delete button click
-    const handleDelete = () => {
-        dispatch(deleteTaskAsync(task_id));
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        await dispatch(deleteTaskAsync(task_id));
         navigate('/tasks');
     };
 
     // Handle edit button click
-    const handleEdit = () => {
+    const handleEdit = (e) => {
+        e.preventDefault();
         // Toggle the editing state
         setEditing(!editing);
     };
