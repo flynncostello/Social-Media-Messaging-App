@@ -3,7 +3,7 @@ const tasksModel = require('../models/supabaseTaskModel');
 exports.getAllTasks = async (req, res) => {
     try {
         const tasks = await tasksModel.getAllTasks();
-        //console.log("TASKS IN SERVER CONTROLLER, ", tasks)
+        console.log("TASKS IN SERVER CONTROLLER, ", tasks)
         res.json(tasks);
     } catch (error) {
         res.status(404).json({ error: 'Tasks not found' });
