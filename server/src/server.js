@@ -23,8 +23,13 @@ app.get("*", (req, res) => {
 const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || 10000;
 
-app.listen(port, host, () => {
+// Increase server.keepAliveTimeout and server.headersTimeout
+const server = app.listen(port, host, () => {
   console.log(`App listening on http://${host}:${port}!`);
 });
+
+// Set server.keepAliveTimeout and server.headersTimeout to 300 seconds (5 minutes)
+server.keepAliveTimeout = 300000; // 300 seconds
+server.headersTimeout = 300000;  // 300 seconds
 
 module.exports = app;
