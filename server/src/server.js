@@ -16,11 +16,11 @@ app.use(express.urlencoded({ extended: false }));
 // app.use("https://full-stack-to-do-list-app.onrender.com/api/tasks", tasksRouter);
 app.use("/api/tasks", tasksRouter);
 
-/*
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'client', 'public', 'index.html'));
 });
-*/
+
 
 //const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || 10000;
