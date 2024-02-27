@@ -3,13 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "start": "npm install && node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
     "body-parser": "^1.20.2",
@@ -17,5 +10,12 @@
     "express": "^4.18.2",
     "morgan": "^1.10.0",
     "pg": "^8.11.3"
-  }
+  },
+  "scripts": {
+    "start": "npm install && node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
