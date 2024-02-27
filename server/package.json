@@ -12,8 +12,8 @@
     "pg": "^8.11.3"
   },
   "scripts": {
-    "start": "npm install && node src/server.js",
-    "build": "echo 'No build step necessary for this server.'",
+    "start": "node src/server.js",
+    "build": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
