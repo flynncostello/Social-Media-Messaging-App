@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+//import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
 function generateTemporaryId() {
@@ -7,7 +7,7 @@ function generateTemporaryId() {
 }
 
 const TaskForm = ({ submitFormFunction }) => {
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
 
   // State for the new task form
   const [newTaskTitle, setNewTaskTitle] = useState('');
