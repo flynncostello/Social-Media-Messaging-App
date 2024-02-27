@@ -21,18 +21,22 @@ const TaskPage = () => {
     const task = tasks_obj[task_id];
 
     // State for the TaskForm
+    /*
     const [title, setTitle] = useState(task.title || '');
     const [description, setDescription] = useState(task.description || '');
     const [created_at, setCreatedAt] = useState(task.created_at || '2021-01-01T00:00:00.000Z');
+    */
 
     const [editing, setEditing] = useState(false);
 
+    /*
     useEffect(() => {
         // Set the form fields when task details change
         setTitle(task.title || '');
         setDescription(task.description || '');
         setCreatedAt(task.created_at || '2021-01-01T00:00:00.000Z');
     }, [task]);
+    */
 
     // Handle delete button click
     const handleDelete = () => {
