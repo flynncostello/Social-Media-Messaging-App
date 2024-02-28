@@ -27,6 +27,7 @@ const Tasks = () => {
     dispatch(addTaskAsync(newTask));
   };
 
+  
   return (
     <div className='tasks-page'>
       <h1 className='tasks-heading'>Tasks</h1>
