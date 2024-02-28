@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Tasks from './components/tasks/Tasks';
@@ -8,19 +8,17 @@ import Home from './components/home/Home';
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Save the current route path in localStorage when route changes
     const handleRouteChange = () => {
-      localStorage.setItem('lastPath', window.location.pathname);
+      localStorage.setItem('lastPath', location.pathname);
     };
 
-    const unlisten = navigate(handleRouteChange);
-
-    return () => {
-      unlisten();
-    };
-  }, [navigate]);
+    // Listen for changes in the location
+    return location.listen(handleRouteChange);
+  }, [location]);
 
   useEffect(() => {
     // Retrieve the last path from localStorage
