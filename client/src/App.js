@@ -6,18 +6,13 @@ import Tasks from './components/tasks/Tasks';
 import TaskPage from './components/tasks/TaskPage';
 import Home from './components/home/Home';
 
-export default function App() {
+const RouteManager = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     // Save the current route path in localStorage when route changes
-    const handleRouteChange = () => {
-      localStorage.setItem('lastPath', location.pathname);
-    };
-
-    // Listen for changes in the location
-    return location.listen(handleRouteChange);
+    localStorage.setItem('lastPath', location.pathname);
   }, [location]);
 
   useEffect(() => {
@@ -30,6 +25,10 @@ export default function App() {
     }
   }, [navigate]);
 
+  return null;
+};
+
+export default function App() {
   return (
     <Provider store={store}>
       <Router>
@@ -37,6 +36,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/tasks/:task_id" element={<TaskPage />} />
+          <Route path="*" element={<RouteManager />} />
         </Routes>
       </Router>
     </Provider>
