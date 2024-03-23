@@ -3,7 +3,7 @@ const supabase = require('../services/supabaseDatabaseService');
 const friendsModel = {
     m_getUsersFriends: async (user_id) => {
         try {
-            const { data } = await supabase.from("friends").select("*").eq("id", user_id);
+            const { data } = await supabase.from("friends").select("*").eq("user_id", user_id);
             const friends = data.length > 0 ? data : null;
             if (friends) {
                 return friends;
