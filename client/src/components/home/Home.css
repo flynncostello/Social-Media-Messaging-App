@@ -1,0 +1,63 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+  }
+  
+  /* Navigation Bar */
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  /* Main Content */
+  .card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-title {
+    font-weight: 700;
+  }
+  
+  .list-unstyled li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .fa-check {
+    margin-right: 0.5rem;
+  }
+  
+  /* Footer */
+  footer {
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  footer a {
+    color: #ccc;
+    transition: color 0.3s;
+  }
+  
+  footer a:hover {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 767.98px) {
+    .navbar-brand .logo {
+      font-size: 1.2rem;
+    }
+  
+    .ml-auto {
+      margin-left: 0 !important;
+    }
+  
+    .btn {
+      margin-top: 0.5rem;
+    }
+  }

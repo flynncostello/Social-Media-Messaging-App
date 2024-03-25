@@ -1,8 +1,16 @@
 import { combineReducers } from 'redux';
-import tasksReducer from '../components/tasks/tasksSlice';
+
+import userSlice from '../slices/userSlice';
+import friendsSlice from '../slices/friendsSlice';
+import chatroomsSlice from '../slices/chatroomsSlice';
+import friendRequestsSlice from '../slices/friendRequestsSlice';
+
 
 const rootReducer = combineReducers({
-    tasks: tasksReducer
+    user: userSlice,
+    friends: friendsSlice,
+    chatrooms: chatroomsSlice,
+    friendRequests: friendRequestsSlice,
 });
 
 export default rootReducer;

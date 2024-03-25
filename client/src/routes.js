@@ -1,9 +1,11 @@
 // routes.js
 const ROUTES = {
     root: () => "/",
-    tasks: () => "/tasks",
-    taskRoute: (task_id) => `/tasks/${task_id}`,
+    login: () => "/login",
+    signup: () => "/signup",
+    dashboard: (userId) => `/dashboard/${userId}`,
+    chatroom: (chatroomId, userId) => `/chatroom/${chatroomId}/${userId}`,
 };
-  
+
 export default ROUTES;
   

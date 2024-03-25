@@ -2,9 +2,16 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import Tasks from './components/tasks/Tasks';
-import TaskPage from './components/tasks/TaskPage';
+
+/*
+Home.js
+Login.js
+SignUp.js
+Dashboard.js
+Chatrooms.js
+*/
 import Home from './components/home/Home';
+import Login from './components/login/Login';
 
 const RouteManager = () => {
   const navigate = useNavigate();
@@ -28,17 +35,24 @@ const RouteManager = () => {
   return null;
 };
 
+
 export default function App() {
   return (
     <Provider store={store}>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/tasks/:task_id" element={<TaskPage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<RouteManager />} />
         </Routes>
       </Router>
     </Provider>
   );
 }
+
+/*
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/dashboard/:userId" element={<Dashboard />} />
+          <Route path="/chatrooms/:chatroomId/:userId" element={<Chatroom />} />
+*/
