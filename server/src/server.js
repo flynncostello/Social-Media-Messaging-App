@@ -4,18 +4,15 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('morgan');
 const path = require('path');
+
 const passport = require('passport');
 const session = require('express-session');
 
-
-//const pool = require('./config/db');
 const supabase = require('./services/supabaseDatabaseService');
 
 const initializePassport = require('./passport_config');
-const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
 
 const usersRouter = require("./routes/usersRouter");
 const friendsRouter = require("./routes/friendsRouter");
@@ -34,8 +31,6 @@ app.use(cors({
   origin: 'http://localhost:3001',
   credentials: true,
 }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session middleware
 app.use(
@@ -53,11 +48,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/users", usersRouter);
 app.use("/api/friends", friendsRouter);
@@ -68,21 +61,21 @@ app.use("/api/messages", messagesRouter);
 
 // Login route
 app.post('/api/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'authentication failed' });
-    }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      // Return the user's ID in the response
-      return res.json({ success: true, message: 'Logged in successfully', userId: user.user_id });
-    });
-  })(req, res, next);
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+        if (!user) {
+          return res.status(401).json({ success: false, message: 'authentication failed' });
+        }
+        req.logIn(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+          // Return the user's ID in the response
+          return res.json({ success: true, message: 'Logged in successfully', user: user });
+        });
+    })(req, res, next);
 });
 
 // Signup route

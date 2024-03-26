@@ -27,11 +27,12 @@ const usersModel = {
     },
 
     m_createUser: async (user_info) => {
-        const { username, password } = user_info;
+        console.log(user_info)
+        const { username, password, is_active } = user_info;
         try {
             const { data, error } = await supabase
                 .from("users")
-                .insert([{ username, password }])
+                .insert([{ username, password, is_active }])
                 .select();
             
             if (error) {
@@ -49,12 +50,12 @@ const usersModel = {
     },
 
     m_updateUser: async (user_id, updated_user_info) => {
-        const { username, password } = updated_user_info;
+        const { username, password, is_active } = updated_user_info;
       
         try {
           const { data, error } = await supabase
             .from("users")
-            .update({ username, password })
+            .update({ username, password, is_active })
             .eq('id', user_id)
             .select();
                   
