@@ -4,29 +4,26 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const supabase = require('./services/supabaseDatabaseService');
 
+// Used to initialize a session where session id for user is stored in cookies
+// Session will remain until user logs out or session expires
 function initializePassport(passport) {
     passport.use(
         new LocalStrategy(async (username, password, done) => {
             try {
                 const result = await supabase.from("users").select("*").eq("username", username);
-                console.log("RESULT DATA: ", result.data)
                 if (result.data.length > 0) {
                     const user = result.data[0];
-                    console.log("USER, ", user);
-                    match = password.toString() === user.password.toString();
-                    console.log("MATCH, ", match)
-                    //const match = await bcrypt.compare(password, user.password);
-                    //console.log("MATCH: ", match)
+                    const match = bcrypt.compareSync(password, user.password);
                     if (match) {
-                        return done(null, user);
+                        return done(null, user, { message: 'Logged in successfully' });
                     } else {
                         return done(null, false, { message: 'Incorrect password.' });
                     }
                 } else {
-                    return done(null, false, { message: 'User not found.' });
+                    return done(null, false, { message: 'Username not found.' });
                 }
             } catch (error) {
-                    return done(error);
+                return done(error);
             }
         })
     );

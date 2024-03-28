@@ -4,7 +4,7 @@ exports.getUsersFriends = async (req, res) => {
     const user_id = req.params.userId;
     try {
         const users_friends = await friendsModel.m_getUsersFriends(user_id);
-        console.log("USERS FRIENDS: ", users_friends)
+        console.log("USERS FRIENDSHIPS: ", users_friends)
         res.json(users_friends);
     } catch (error) {
         res.status(404).json({ error: 'User friends not found' });

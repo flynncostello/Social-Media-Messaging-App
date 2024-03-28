@@ -61,54 +61,67 @@ app.use("/api/messages", messagesRouter);
 
 // Login route
 app.post('/api/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', (err, user, { message }) => {
         if (err) {
           return next(err);
         }
         if (!user) {
-          return res.status(401).json({ success: false, message: 'authentication failed' });
+          return res.json({ success: false, message });
         }
         req.logIn(user, (err) => {
           if (err) {
             return next(err);
           }
           // Return the user's ID in the response
-          return res.json({ success: true, message: 'Logged in successfully', user: user });
+          return res.json({ success: true, message, user });
         });
     })(req, res, next);
 });
 
+
 // Signup route
 app.post('/api/signup', async (req, res) => {
-  const { username, password } = req.body;
+  // Password will already be hashed by now
+  const { username, hashedPassword, is_active } = req.body;
   const userExists = await supabase.from("users").select("*").eq("username", username);
+  
+  console.log("HASH PASSWORD FOR SIGN UP, ", hashedPassword)
 
-  if (userExists.rows.length > 0) {
+  if (userExists.data.length > 0) {
+    console.log("Username already exists")
     return res.status(400).json({ error: 'Username already exists' });
   }
+  console.log("Username is valid")
 
-  const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    await supabase.from("users").insert([{ username, password: hashedPassword }]);
-    // Generate a token or send a success message
-    res.status(201).json({ success: true, message: 'User created successfully' });
+    const response = await supabase.from("users").insert([{ username, password: hashedPassword, is_active}]);
+    console.log("User successfully created and added to database");
+    return res.status(201).json({ success: true, message: 'User created successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // Logout route
 app.get('/api/logout', (req, res) => {
-  req.logout();
-  res.json({ success: true, message: 'Logged out successfully' });
+  req.logout((err) => {
+    if (err) {
+      return res.json({ success: false, message: 'Error logging out' });
+    }
+    res.json({ success: true, message: 'Logged out successfully' });
+  });
 });
+
+
 
 const port = process.env.PORT || 3000;
 
 const server = app.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });
+
 
 module.exports = app;
 

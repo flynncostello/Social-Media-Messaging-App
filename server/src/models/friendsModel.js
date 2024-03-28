@@ -4,12 +4,7 @@ const friendsModel = {
     m_getUsersFriends: async (user_id) => {
         try {
             const { data } = await supabase.from("friends").select("*").eq("user_id", user_id);
-            const friends = data.length > 0 ? data : null;
-            if (friends) {
-                return friends;
-            } else {
-                throw new Error('Friends not found');
-            }
+            return data; // Friends will either contain objects of friends or be empty signifying no friends
         } catch (error) {
             console.error('Error fetching friends by user ID:', error);
             throw error;

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@reduxjs/toolkit": "^2.2.1",
@@ -18,7 +19,8 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "uuid": "^9.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "bcryptjs": "^2.4.3"
   },
   "scripts": {
     "start": "npm install && react-scripts start",

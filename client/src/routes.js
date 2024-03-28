@@ -4,7 +4,7 @@ const ROUTES = {
     login: () => "/login",
     signup: () => "/signup",
     dashboard: (userId) => `/dashboard/${userId}`,
-    chatroom: (chatroomId, userId) => `/chatroom/${chatroomId}/${userId}`,
+    userAccount: (userId) => `/userAccount/${userId}`
 };
 
 export default ROUTES;

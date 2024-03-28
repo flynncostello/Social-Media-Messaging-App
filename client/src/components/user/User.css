@@ -1,0 +1,40 @@
+.user {
+    padding: 20px;
+    width: 50px;
+}
+
+.user-icon {
+    text-align: center;
+    font-size: 23px; /* Set the size of the user icon */
+    padding: 10px 15px; /* Add padding around the user icon */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    background-color: rgb(227, 227, 227);
+    border-radius: 50%; /* Make the user icon round */
+}
+
+.user-icon:hover {
+    opacity: 0.7;
+}
+
+.dropdown {
+    position: absolute; /* Position the dropdown absolutely */
+    width: 10%; /* Set width of dropdown */
+    background-color: #f1f1f1; /* Set background color of dropdown */
+    border-radius: 5px; /* Add border radius to dropdown */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Add shadow to dropdown */
+    padding: 10px; /* Add padding inside the dropdown */
+    margin-top: 5px;
+}
+
+.dropdown a {
+    display: block; /* Make links block-level */
+    color: #333; /* Set text color of links */
+    text-decoration: none; /* Remove default underline */
+    padding: 8px 8px; /* Add padding to links */
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.dropdown a:hover {
+    background-color: #ddd; /* Change background color of links on hover */
+}

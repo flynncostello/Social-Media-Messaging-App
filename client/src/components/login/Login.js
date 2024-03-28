@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../slices/userSlice';
+
 import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
-import { setUser } from '../../slices/userSlice';
-import { useDispatch, useSelector } from 'react-redux';
+
+import axios from 'axios';
+
 import userAPI from '../../api/user';
+
 
 const Login = () => {
     const [loginUsername, setLoginUsername] = useState('');
@@ -17,22 +22,25 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:3000/api/login', { username: loginUsername, password: loginPassword });
+            
             const data = response.data;
+            console.log("DATA FROM LOGIN: ", data);
             if (data.success) {
                 const user_data = data.user
                 user_data.is_active = true;
-                alert('Logged in successfully!');
-                console.log("USER INFO: ", user_data);
-                // Updating user information in database, i.e., making user active now
                 const user_info = { username: user_data.username, password: user_data.password, is_active: user_data.is_active };
-                userAPI.updateUser(user_data.id, user_info); // Update user's is_active status
-                dispatch(setUser(user_data)); // Create storage slice for user data
-                //localStorage.setItem('userId', data.userId); // Store the user ID in localStorage
+                
+                dispatch(setUser(user_data)); // Create storage slice for user data (Front-end only)
+                userAPI.updateUser(user_data.id, user_info); // Update user's is_active status in database (Back-end only)
+
+                console.log("User logged in successfully, id:", user_data.id)
                 navigate(ROUTES.dashboard(user_data.id)); // Redirect to Dashboard
             } else {
-                alert('Login failed:', data.message);
+                alert(`Login failed: ${data.message}`);
             }
         } catch (error) {
+            // Handle other types of errors
+            console.error('Error:', error);
             alert('Error: ' + error);
         }
     };

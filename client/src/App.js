@@ -12,7 +12,9 @@ Chatrooms.js
 */
 import Home from './components/home/Home';
 import Login from './components/login/Login';
+import SignUp from './components/signup/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
+import UserAccount from './components/user/UserAccount';
 
 const RouteManager = () => {
   const navigate = useNavigate();
@@ -44,7 +46,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard/:userId" element={<Dashboard />} />
+          <Route path="/userAccount/:userId" element={<UserAccount />} />
           <Route path="*" element={<RouteManager />} />
         </Routes>
       </Router>
