@@ -94,6 +94,19 @@ const usersModel = {
             console.error('Error deleting user:', error);
             throw error;
         }
+    },
+
+    m_searchUsersByUsername: async (searchTerm) => {
+        try {
+            const { data } = await supabase
+                .from('users')
+                .select('id, username')
+                .ilike('username', `${searchTerm}%`);
+            return data;
+        } catch (error) {
+            console.error('Error searching users:', error);
+            throw error;
+        }
     }
 };
 

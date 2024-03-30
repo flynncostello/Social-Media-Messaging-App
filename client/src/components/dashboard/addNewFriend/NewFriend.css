@@ -1,0 +1,27 @@
+.new-friend-container {
+    padding: 20px;
+    width: 50px;
+}
+
+.new-friend-icon {
+    margin-top: 6px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.new-friend-icon:hover {
+    opacity: 0.7;
+}
+
+.new-friend-tab-container {
+    position: absolute;
+    top: 20px;
+    left: 300px; /* Position the tab 50px to the right of the icon */
+    width: 200px;
+    height: 450px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+  }

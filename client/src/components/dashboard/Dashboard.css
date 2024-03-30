@@ -1,0 +1,25 @@
+.dashboard {
+    display: inline-flex;
+}
+
+.left-sidebar {
+    border: 5px solid pink;
+}
+
+.top-icons {
+    display: flex;
+    justify-content: space-between;
+    border: 5px solid black;
+}
+
+.search-bar {
+    border: 5px solid blue;
+}
+
+.friends-list {
+    border: 5px solid green;
+}
+
+.right-area {
+    border: 5px solid yellow;
+}

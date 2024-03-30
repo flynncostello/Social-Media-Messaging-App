@@ -1,0 +1,43 @@
+.friends-badge {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid rgb(238, 238, 238);
+    padding: 10px 20px;
+    min-height: 65px;
+    cursor: pointer;
+}
+
+.friends-badge .friends-icon {
+    width: 20px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+}
+
+
+.friends-badge .friends-info {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.friends-badge .username {
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.delete-friend-button {
+    color: red;
+    font-size: 20px;
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+.delete-friend-button:hover {
+    opacity: 0.7;
+}

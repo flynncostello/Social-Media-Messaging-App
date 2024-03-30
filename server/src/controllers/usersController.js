@@ -51,3 +51,14 @@ exports.deleteUser = async (req, res) => {
         res.status(404).json({ error: 'User not found' });
     }
 };
+
+exports.searchUsers = async (req, res) => {
+    const searchTerm = req.query.username;
+    console.log(searchTerm)
+    try {
+        const users = await usersModel.m_searchUsersByUsername(searchTerm);
+        res.json(users);
+    } catch (error) {
+        res.status(404).json({ error: 'Users not found' });
+    }
+};

@@ -5,6 +5,19 @@ import userAPI from '../../api/user';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import { clearUserSlice } from '../../slices/userSlice';
+import { clearFriendsSlice } from '../../slices/friendsSlice';
+import { clearRequests } from '../../slices/friendRequestsSlice';
+
+
+/*
+Process:
+- Starts by just showing id, username, and is_active state
+- When user deletes their account it deletes from the database and clears all slices
+- When user logs out it simply changes is_active state in database and clears all slices
+*/
+
+
 const UserAccount = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -13,10 +26,13 @@ const UserAccount = () => {
   const handleDeleteAccount = () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account?");
     if (confirmDelete) {
-      console.log('Deleting account of user with ID:', user.id);
+      //console.log('Deleting account of user with ID:', user.id);
       userAPI.deleteUser(user.id)
         .then(() => {
           alert('Account deleted successfully!');
+          dispatch(clearUserSlice()); // Clear user slice
+          dispatch(clearFriendsSlice()); // Clear friends slice
+          dispatch(clearRequests()); // Clear friend requests slice
           navigate('/');
         })
         .catch((error) => {
@@ -33,6 +49,8 @@ const UserAccount = () => {
         if (response.data.success) {
             alert('Logged out successfully!');
             userAPI.updateUser(user.id, { is_active: false })
+            dispatch(clearUserSlice()); // Clear user slice
+            dispatch(clearFriendsSlice()); // Clear friends slice
             navigate('/');
         } else {
             alert('Logout failed:', response.data.message);

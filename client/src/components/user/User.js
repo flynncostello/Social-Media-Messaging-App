@@ -6,19 +6,33 @@ import { faUser as solidUserIcon, faSignOutAlt } from '@fortawesome/free-solid-s
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../slices/userSlice';
 
+import { clearUserSlice } from '../../slices/userSlice';
+import { clearFriendsSlice } from '../../slices/friendsSlice';
+import { clearRequests } from '../../slices/friendRequestsSlice';
+
+import { useDispatch } from 'react-redux';
+
 import userAPI from '../../api/user';
+import ROUTES from '../../routes';
 
 import './User.css';
 
-import ROUTES from '../../routes';
+/*
+Process:
+- Allows users to access their account setting or logout
+- When logging out it changes the user's is_active status to false in the database, clears the user slice, and redirects to the home page
+*/
+
 
 const User = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const user = useSelector(selectUser);
 
     const handleClick = () => {
@@ -31,8 +45,12 @@ const User = () => {
             const response = await axios.get('http://localhost:3000/api/logout');
             if (response.data.success) {
                 alert('Logged out successfully!');
-                userAPI.updateUser(user.id, { is_active: false })
-                navigate('/');
+                userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
+                
+                dispatch(clearUserSlice()); // Clear user slice
+                dispatch(clearFriendsSlice()); // Clear friends slice
+                dispatch(clearRequests()); // Clear friend requests slice
+                navigate('/'); // Redirect to home page
             } else {
                 alert('Logout failed:', response.data.message);
             }
@@ -43,7 +61,7 @@ const User = () => {
     };
     
     const handleAccountSettings = () => {
-        console.log("Going to account settings of user with id: ", user.id);
+        //console.log("Going to account settings of user with id: ", user.id);
         navigate(ROUTES.userAccount(user.id))
     }
 

@@ -2,25 +2,46 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const friendsSlice = createSlice({
   name: 'friends',
-  initialState: [],
+  initialState: {}, // Object with keys = friendship_id, and values = friend_id
+  /*
+  {
+    "24598h34f": "dg34geg", <-- friendship_id: friend_id
+    ...
+  }
+  */
   reducers: {
-    setFriends: (state, action) => {
+    /* For all, action.payload = [
+        "0": {
+            "id": 1,
+            "user_id": 1,
+            "friend_id": 2
+        },
+        ...
+    ]
+    */
+    setFriends: (state, action) => { // action.payload is an array of objects each containing friends info
         const friends = action.payload
-        return friends; // Return a new array
+        friends.forEach((friend) => {
+            state[friend.id] = friend.friend_id;
+        });
     },
     addFriend: (state, action) => {
-        const newFriend = action.payload;
-        if (!state.includes(newFriend)) {
-            state.push(newFriend); // This is fine because it's a mutable operation on a draft
+        const newFriendId = action.payload.friend_id; // action.payload is an object containing friend's info as well as friend_ship id
+        const newFriendshipId = action.payload.id;
+        if (!state[newFriendshipId]) {
+            state[newFriendshipId] = newFriendId;
         }
     },
-    removeFriend: (state, action) => {
-        const friendId = action.payload.friend_id;
-        return state.filter((friendship) => friendship.friend_id !== friendId);
+    removeFriend: (state, action) => { // action.payload is friendship_id
+        const friendship_id = action.payload;
+        delete state[friendship_id];
+    },
+    clearFriendsSlice: (state) => {
+        return {};
     },
   },
 });
 
-export const { setFriends, addFriend, removeFriend, updateFriend } = friendsSlice.actions;
+export const { setFriends, addFriend, removeFriend, clearFriendsSlice } = friendsSlice.actions;
 export const selectFriends = (state) => state.friends;
 export default friendsSlice.reducer;

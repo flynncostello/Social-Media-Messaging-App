@@ -6,6 +6,12 @@ import ROUTES from '../../routes';
 
 import bcrypt from 'bcryptjs';
 
+/*
+Process:
+- User enters username and password
+- User details are sent to server and stored in database
+- userSlice not impacted
+*/
 
 const Signup = () => {
     const [signupUsername, setSignupUsername] = useState('');
