@@ -1,3 +1,50 @@
 .friend-request-received-container {
     border: 1px solid black;
+    display: inline-flex;
 }
+
+.accept-friend-request-button {
+    background-color: rgb(25, 225, 25);
+    border-radius: 5px;
+    min-height: 35px;
+    align-self: center;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+    box-shadow: 0.5px 0.5px 0.5px 0.5px rgba(161, 161, 161, 0.75);
+}
+
+.accept-friend-request-button:hover {
+    opacity: 0.8;
+}
+
+.accept-friend-request-button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+
+.reject-friend-request-button {
+    background-color: rgb(255, 0, 0);
+    border-radius: 5px;
+    min-height: 35px;
+    align-self: center;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+    box-shadow: 0.5px 0.5px 0.5px 0.5px rgba(161, 161, 161, 0.75);
+}
+
+.reject-friend-request-button:hover {
+    opacity: 0.8;
+}
+
+.reject-friend-request-button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+

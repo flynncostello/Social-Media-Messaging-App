@@ -24,12 +24,12 @@ const FriendRequests = () => {
             if (userId) {
                 try {
                     const sentRequests = await friendRequestAPI.getFriendRequestsSent(userId);
-                    console.log("SENT REQUESTS: ", sentRequests)
+                    //console.log("SENT REQUESTS: ", sentRequests)
                     dispatch(clearSentRequests());
                     dispatch(setSentRequests(sentRequests));
 
                     const receivedRequests = await friendRequestAPI.getFriendRequestsReceived(userId);
-                    console.log("RECEIVED REQUESTS: ", receivedRequests)
+                    //console.log("RECEIVED REQUESTS: ", receivedRequests)
                     dispatch(clearReceivedRequests());
                     dispatch(setReceivedRequests(receivedRequests));
                 } catch (error) {
@@ -46,7 +46,7 @@ const FriendRequests = () => {
 
     const handleFilterChange = (newFilter) => {
         setFilter(newFilter);
-        console.log("CUR FILTER, ", newFilter);
+        //console.log("CUR FILTER, ", newFilter);
     };
 
     return (
@@ -61,14 +61,14 @@ const FriendRequests = () => {
                 <div>
                     <h3>Requests Sent:</h3>
                     {friendRequestsSent.map((request) => (
-                        <FriendRequestSent created_at={request.created_at} id={request.id} receiver_id={request.receiver_id} sender_id={request.sender_id} status={request.status} />
+                        <FriendRequestSent key={request.id} created_at={request.created_at} id={request.id} receiver_id={request.receiver_id} sender_id={request.sender_id} status={request.status} />
                     ))}
                 </div>
                 ) : (
                 <div>
                     <h3>Requests Received:</h3>
                     {friendRequestsReceived.map((request) => (
-                        <FriendRequestReceived created_at={request.created_at} id={request.id} receiver_id={request.receiver_id} sender_id={request.sender_id} status={request.status} />
+                        request.status === 'PENDING' && <FriendRequestReceived key={request.id} created_at={request.created_at} id={request.id} receiver_id={request.receiver_id} sender_id={request.sender_id} status={request.status} />
                     ))}
                 </div>
                 )}

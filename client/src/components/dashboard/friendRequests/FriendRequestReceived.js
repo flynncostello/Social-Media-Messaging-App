@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import friendRequestAPI from '../../../api/friend_request';
 import './FriendRequestReceived.css';
 import { useDispatch } from 'react-redux';
@@ -7,9 +7,26 @@ import {
 } from '../../../slices/friendRequestsSlice';
 import friendsAPI from '../../../api/friends';
 import { addFriend } from '../../../slices/friendsSlice';
+import { formatDate } from '../../../utils';
+import userAPI from '../../../api/user';
 
 const FriendRequest = ({ created_at, id, receiver_id, sender_id, status }) => {
+    const [senderUsername, setSenderUsername] = useState('');
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const fetchSenderUsername = async () => {
+            try {
+                const sender = await userAPI.getUser(sender_id);
+                setSenderUsername(sender.username)
+            } catch (error) {
+                console.error('Error fetching sender username:', error);
+            }
+        };
+
+        fetchSenderUsername();
+    }, [sender_id]);
+
 
     const handleAcceptRequest = async (requestId, status) => {
         try {
@@ -51,12 +68,11 @@ const FriendRequest = ({ created_at, id, receiver_id, sender_id, status }) => {
 
     return (
         <div className='friend-request-received-container'>
-            <p>Friend Request ID: {id}</p>
-            <p>Friend request received from {sender_id} at {created_at}</p>
-            <button onClick={() => handleAcceptRequest(id, 'ACCEPTED')}>
+            <p>Friend request received from <b>{senderUsername}</b> ({formatDate(created_at)})</p>
+            <button onClick={() => handleAcceptRequest(id, 'ACCEPTED')} className='accept-friend-request-button'>
                 Accept
             </button>
-            <button onClick={() => handleRejectRequest(id, 'REJECTED')}>
+            <button onClick={() => handleRejectRequest(id, 'REJECTED')} className='reject-friend-request-button'>
                 Reject
             </button>
         </div>

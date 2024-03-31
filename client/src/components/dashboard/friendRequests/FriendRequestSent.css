@@ -1,3 +1,22 @@
 .friend-request-sent-container {
     border: 1px solid black;
+    padding: 5px 20px;
+}
+
+.request-sent-status-badge-accepted {
+    display: inline;
+    color: rgb(0, 169, 0);
+    font-weight: bold;
+}
+
+.request-sent-status-badge-pending {
+    display: inline;
+    color: gray;
+    font-weight: bold;
+}
+
+.request-sent-status-badge-rejected {
+    display: inline;
+    color: rgb(255, 0, 0);
+    font-weight: bold;
 }
