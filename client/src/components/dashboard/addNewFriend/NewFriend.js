@@ -36,3 +36,4 @@ const NewFriend = () => {
 
 export default NewFriend;
 
+
