@@ -1,23 +1,10 @@
 import React, { useState } from 'react';
-
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../slices/userSlice';
-
 import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
-
 import axios from 'axios';
-
 import userAPI from '../../api/user';
-
-
-/*
-Process:
-- User enters username and password
-- Once details have been confirmed we start the current users session
-- Dispatches a setUser action to userSlice to initliaze the user slice with user data
-including id, username, password, and is_active
-*/
 
 const Login = () => {
     const [loginUsername, setLoginUsername] = useState('');
@@ -30,23 +17,56 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:3000/api/login', { username: loginUsername, password: loginPassword });
-            const data = response.data; // This includes message, success state, and user object
+            const data = response.data;
 
             if (data.success) {
-                const user_data = data.user // This includes created_at, id, is_active, password, username
-                //console.log("USER DATA FROM SERVER: ", user_data)
+                const user_data = data.user;
                 user_data.is_active = true;
-                
-                dispatch(setUser(user_data)); // Create storage slice for user data (Front-end only)
-                userAPI.updateUser(user_data.id, user_data); // Update user's is_active status in database (Back-end only)
 
-                //console.log("User logged in successfully, with username: ", user_data.username)
-                navigate(ROUTES.dashboard(user_data.id)); // Redirect to Dashboard
+                // Generate key pair
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: 'RSA-OAEP',
+                        modulusLength: 4096,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        hash: 'SHA-256',
+                    },
+                    true,
+                    ['encrypt', 'decrypt']
+                );
+
+                // Export private key
+                const exported_private_key = await window.crypto.subtle.exportKey(
+                    'pkcs8',
+                    keyPair.privateKey
+                );
+
+                // Convert private key to string
+                const privateKeyString = btoa(String.fromCharCode.apply(null, new Uint8Array(exported_private_key)));
+
+                // Store private key in localStorage
+                localStorage.setItem('private_key', privateKeyString);
+
+                // Export public key
+                const exported_public_key = await window.crypto.subtle.exportKey(
+                    'spki',
+                    keyPair.publicKey
+                );
+
+                // Convert public key to string
+                const publicKeyString = btoa(String.fromCharCode.apply(null, new Uint8Array(exported_public_key)));
+                //console.log('Public key:', publicKeyString);
+                // Add public key to user data
+                user_data.public_key = publicKeyString;
+
+                dispatch(setUser(user_data));
+                userAPI.updateUser(user_data.id, user_data);
+
+                navigate(ROUTES.dashboard(user_data.id));
             } else {
                 alert(`Login failed: ${data.message}`);
             }
         } catch (error) {
-            // Handle other types of errors
             console.error('Error:', error);
             alert('Error: ' + error);
         }
@@ -58,11 +78,11 @@ const Login = () => {
             <form onSubmit={handleLogin}>
                 <label>
                     Username:
-                    <input type="text" value={loginUsername} onChange={e => setLoginUsername(e.target.value)} />
+                    <input type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
                 </label>
                 <label>
                     Password:
-                    <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} />
+                    <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
                 </label>
                 <input type="submit" value="Submit" />
             </form>

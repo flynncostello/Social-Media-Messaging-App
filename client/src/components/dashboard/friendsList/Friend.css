@@ -4,8 +4,12 @@
     background-color: #fff;
     border: 1px solid rgb(238, 238, 238);
     padding: 10px 20px;
-    min-height: 65px;
+    height: 65px;
     cursor: pointer;
+}
+
+.friends-badge:hover {
+    opacity: 0.7;
 }
 
 .friends-badge .friends-icon {

@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import ROUTES from '../../routes';
 
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // Used for secure hashing
 
 /*
 Process:

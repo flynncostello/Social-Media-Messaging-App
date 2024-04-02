@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearUserSlice } from '../../slices/userSlice';
 import { clearFriendsSlice } from '../../slices/friendsSlice';
 import { clearRequests } from '../../slices/friendRequestsSlice';
-
+import { resetChatroom } from '../../slices/chatroomSlice';
 
 /*
 Process:
@@ -33,6 +33,7 @@ const UserAccount = () => {
           dispatch(clearUserSlice()); // Clear user slice
           dispatch(clearFriendsSlice()); // Clear friends slice
           dispatch(clearRequests()); // Clear friend requests slice
+          dispatch(resetChatroom()); // Clear chatroom slice
           navigate('/');
         })
         .catch((error) => {

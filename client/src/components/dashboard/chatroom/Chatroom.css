@@ -1,0 +1,9 @@
+.user-message {
+    text-align: right;
+    color: rgb(0, 145, 255);
+}
+
+.friend-message {
+    text-align: left;
+    color: red;
+}

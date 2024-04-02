@@ -6,9 +6,10 @@ const friend_requestsModel = {
             const { data } = await supabase.from("friend_requests").select("*").eq("sender_id", user_id);
             const friend_requests_sent = data.length > 0 ? data : null;
             if (friend_requests_sent) {
+                console.log(friend_requests_sent)
                 return friend_requests_sent;
             } else {
-                throw new Error('Friend requests sent not found');
+                return []; // No friend requests sent
             }
         } catch (error) {
             console.error('Error fetching friend requests sent by user:', error);
@@ -23,7 +24,7 @@ const friend_requestsModel = {
             if (friend_requests_received) {
                 return friend_requests_received;
             } else {
-                throw new Error('Friend requests received not found');
+                return []; // No friend requests received
             }
         } catch (error) {
             console.error('Error fetching friend requests received by user:', error);

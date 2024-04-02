@@ -21,9 +21,11 @@ const friendsSlice = createSlice({
     */
     setFriends: (state, action) => { // action.payload is an array of objects each containing friends info
         const friends = action.payload
-        friends.forEach((friend) => {
-            state[friend.id] = friend.friend_id;
-        });
+        if (friends.length > 0) {
+            friends.forEach((friend) => {
+                state[friend.id] = friend.friend_id;
+            });
+        };
     },
     addFriend: (state, action) => {
         const newFriendId = action.payload.friend_id; // action.payload is an object containing friend's info as well as friend_ship id

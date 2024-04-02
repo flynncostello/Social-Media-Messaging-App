@@ -22,7 +22,7 @@ const FriendRequest = ({ created_at, id, receiver_id, sender_id, status  }) => {
 
     return (
         <div className='friend-request-sent-container'>
-            <p>Friend request sent to <b>{receiverUsername}</b> ({formatDate(created_at)}) <div className={status === 'ACCEPTED' ? 'request-sent-status-badge-accepted' : status === 'PENDING' ? 'request-sent-status-badge-pending' : 'request-sent-status-badge-rejected'}>{status}</div></p>
+            <div className='friend-request-sent-text'>Friend request sent to <b>{receiverUsername}</b> ({formatDate(created_at)}) <p className={status === 'ACCEPTED' ? 'request-sent-status-badge-accepted' : status === 'PENDING' ? 'request-sent-status-badge-pending' : 'request-sent-status-badge-rejected'}>{status}</p></div>
         </div>
     );
 };

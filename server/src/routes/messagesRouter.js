@@ -4,9 +4,10 @@ const router = express.Router();
 const messagesController = require('../controllers/messagesController');
 
 /*
-TASKS 
+TASKS
 /api/messages
 */
+router.get('/chatroom/:chatroomId', messagesController.getMessagesByChatroomId);
 router.get('/:messageId', messagesController.getMessageById);
 router.post('/', messagesController.createMessage);
 router.put('/:messageId', messagesController.updateMessage);

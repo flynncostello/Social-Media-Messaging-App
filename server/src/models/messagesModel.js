@@ -1,6 +1,16 @@
 const supabase = require('../services/supabaseDatabaseService');
 
 const messagesModel = {
+    m_getMessagesByChatroomId: async (chatroom_id) => {
+        try {
+            const { data } = await supabase.from("messages").select("*").eq("chatroom_id", chatroom_id);
+            return data;
+        } catch (error) {
+            console.error('Error fetching messages by chatroom ID:', error);
+            throw error;
+        }
+    },
+
     m_getMessageById: async (message_id) => {
         try {
             const { data } = await supabase.from("messages").select("*").eq("id", message_id);

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import React from 'react';
 
 const friendRequestSlice = createSlice({
   name: 'friendRequest',
@@ -21,10 +22,22 @@ const friendRequestSlice = createSlice({
       state.sentRequests = [];
     },
     setReceivedRequests: (state, action) => {
-      state.receivedRequests = action.payload;
+      const pendingRequests = action.payload.filter(item => item.status.toLowerCase() === 'pending');
+      return {
+        ...state,
+        receivedRequests: pendingRequests
+      };
     },
     addReceivedRequest: (state, action) => {
-      state.receivedRequests.push(action.payload);
+      const receivedRequest = action.payload;
+      const isPending = receivedRequest.status && receivedRequest.status.toLowerCase() === 'pending';
+      if (isPending) {
+        return {
+          ...state,
+          receivedRequests: [...state.receivedRequests, receivedRequest]
+        };
+      }
+      return state; 
     },
     removeReceivedRequest: (state, action) => {
       const requestId = action.payload;

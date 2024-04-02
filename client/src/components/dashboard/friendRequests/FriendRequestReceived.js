@@ -33,6 +33,7 @@ const FriendRequest = ({ created_at, id, receiver_id, sender_id, status }) => {
             // First we make a request to change the friend requests status in the database
             await friendRequestAPI.changeFriendRequestStatus(requestId, status);
             // Next we update this to be reflected in the requests slice
+            //console.log("REQUEST ID TO REMOVE,  ", requestId);
             dispatch(removeReceivedRequest(requestId));
             // Finally we create two new entries in the friends table to make sure connection is two-way
             const friendship_info_for_sender = {

@@ -2,14 +2,14 @@ import { combineReducers } from 'redux';
 
 import userSlice from '../slices/userSlice';
 import friendsSlice from '../slices/friendsSlice';
-import chatroomsSlice from '../slices/chatroomsSlice';
+import chatroomSlice from '../slices/chatroomSlice';
 import friendRequestsSlice from '../slices/friendRequestsSlice';
 
 
 const rootReducer = combineReducers({
     user: userSlice,
     friends: friendsSlice,
-    chatrooms: chatroomsSlice,
+    chatroom: chatroomSlice,
     friendRequests: friendRequestsSlice,
 });
 

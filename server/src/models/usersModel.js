@@ -50,12 +50,12 @@ const usersModel = {
     },
 
     m_updateUser: async (user_id, updated_user_info) => {
-        const { username, password, is_active } = updated_user_info;
+        const { username, password, is_active, public_key } = updated_user_info;
       
         try {
           const { data, error } = await supabase
             .from("users")
-            .update({ username, password, is_active })
+            .update({ username, password, is_active, public_key })
             .eq('id', user_id)
             .select();
                   

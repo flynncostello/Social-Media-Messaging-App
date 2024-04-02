@@ -1,6 +1,7 @@
 .new-friend-container {
     padding: 20px;
     width: 50px;
+    z-index: 100;
 }
 
 .new-friend-icon {

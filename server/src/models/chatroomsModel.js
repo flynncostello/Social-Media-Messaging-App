@@ -15,7 +15,18 @@ const chatroomsModel = {
             throw error;
         }
     },
-
+    m_getChatroomsByUserId: async (user_id) => {
+        try {
+            const { data } = await supabase
+                .from("chatrooms")
+                .select("*")
+                .or(`host_id.eq.${user_id},participant_id.eq.${user_id}`);
+                return data; // User can be either host or participant, either way they're in the chatroom
+        } catch (error) {
+            console.error('Error fetching chatrooms by user ID:', error);
+            throw error;
+        }
+    },
     m_createChatroom: async (chatroom_info) => {
         console.log("CHATROOM INFO: ", chatroom_info)
         const { host_id, participant_id } = chatroom_info;

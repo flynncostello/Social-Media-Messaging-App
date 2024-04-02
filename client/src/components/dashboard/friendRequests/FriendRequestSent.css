@@ -1,6 +1,13 @@
 .friend-request-sent-container {
     border: 1px solid black;
+    background-color: rgb(247, 247, 247);
+    border-radius: 3px;
+    margin-bottom: 2px;
     padding: 5px 20px;
+}
+
+.friend-request-sent-text {
+    padding: 15px 8px;
 }
 
 .request-sent-status-badge-accepted {

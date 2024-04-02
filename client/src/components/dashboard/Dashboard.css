@@ -1,25 +1,72 @@
-.dashboard {
-    display: inline-flex;
+/* Resetting default margin and padding */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
-.left-sidebar {
-    border: 5px solid pink;
+/* Main Dashboard */
+.dashboard {
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: stretch; /* Ensures each child takes full height */
+    flex-direction: row;
+}
+
+/* Left Column */
+.left-column {
+    border: 1.5px solid rgb(235, 235, 235);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 0.50;
 }
 
 .top-icons {
     display: flex;
     justify-content: space-between;
-    border: 5px solid black;
 }
 
 .search-bar {
     border: 5px solid blue;
 }
 
-.friends-list {
-    border: 5px solid green;
+
+/* Middle Column */
+.middle-column {
+    border: 1.5px solid rgb(235, 235, 235);
+    flex: 1.2; /* Takes up equal width */
+    overflow-y: scroll;
 }
 
-.right-area {
-    border: 5px solid yellow;
+.empty-chatroom-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+}
+
+.empty-chatroom-icon {
+    font-size: 100px;
+    color: rgb(230, 230, 230);
+}
+
+.empty-chatroom-instruction-text {
+    font-size: 25px;
+    font-weight: 400;
+    opacity: 0.4;
+    text-align: center;
+}
+
+
+/* Right Column */
+.right-column {
+    flex: 0.8;
+    border: 1.5px solid rgb(235, 235, 235);
 }

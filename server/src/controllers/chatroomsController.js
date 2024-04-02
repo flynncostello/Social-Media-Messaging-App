@@ -10,6 +10,16 @@ exports.getChatroomById = async (req, res) => {
     }
 };
 
+exports.getChatroomsByUserId = async (req, res) => {
+    const user_id = req.params.userId;
+    try {
+        const chatrooms = await chatroomsModel.m_getChatroomsByUserId(user_id);
+        res.json(chatrooms);
+    } catch (error) {
+        res.status(404).json({ error: 'Chatrooms not found' });
+    }
+}
+
 exports.createChatroom = async (req, res) => {
     const chatroom_info = req.body;
     try {

@@ -13,6 +13,7 @@ import { selectUser } from '../../slices/userSlice';
 import { clearUserSlice } from '../../slices/userSlice';
 import { clearFriendsSlice } from '../../slices/friendsSlice';
 import { clearRequests } from '../../slices/friendRequestsSlice';
+import { resetChatroom } from '../../slices/chatroomSlice';
 
 import { useDispatch } from 'react-redux';
 
@@ -50,6 +51,7 @@ const User = () => {
                 dispatch(clearUserSlice()); // Clear user slice
                 dispatch(clearFriendsSlice()); // Clear friends slice
                 dispatch(clearRequests()); // Clear friend requests slice
+                dispatch(resetChatroom()); // Clear chatroom slice
                 navigate('/'); // Redirect to home page
             } else {
                 alert('Logout failed:', response.data.message);

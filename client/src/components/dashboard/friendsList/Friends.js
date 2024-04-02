@@ -20,7 +20,7 @@ const Friends = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        if (!fetchedFriendsData) {
+        if (!fetchedFriendsData && user.is_active) {
           fetchedFriendsData = true
           const friendsData = await friendsAPI.getFriends(user.id);
           /*
@@ -47,12 +47,12 @@ const Friends = () => {
 
   return (
     <div className='friends-column'>
-      {friendships.length === 0 ? (
-        <p></p>
+      {Object.keys(friendships).length === 0 ? (
+        <p className='no-friends-added-text'>Add New Friends</p>
       ) : (
         <ul className='friends-list'>
           {Object.entries(friendships).map(([friendshipId, friendId]) => (
-            <li key={friendshipId} className='friends-list-element'>
+            <li key={friendshipId}>
               <Friend friendId={friendId} friendshipId={friendshipId} />
             </li>
           ))}
