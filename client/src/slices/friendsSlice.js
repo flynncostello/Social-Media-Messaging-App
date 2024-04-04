@@ -27,6 +27,11 @@ const friendsSlice = createSlice({
             });
         };
     },
+    setFriendPublicKey: (state, action) => { // action.payload is an object containing friend_id and public_key
+        const { friend_id, public_key } = action.payload;
+        state[friend_id].public_key = public_key;
+    },
+    
     addFriend: (state, action) => {
         const newFriendId = action.payload.friend_id; // action.payload is an object containing friend's info as well as friend_ship id
         const newFriendshipId = action.payload.id;

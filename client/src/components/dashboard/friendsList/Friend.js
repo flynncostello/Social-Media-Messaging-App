@@ -10,11 +10,14 @@ import { removeFriend } from '../../../slices/friendsSlice';
 import { selectUser } from '../../../slices/userSlice';
 import { setChatroom } from '../../../slices/chatroomSlice';
 import messagesAPI from '../../../api/messages';
+import { decryptWithPrivateKey, encryptMessageWithUsersPassword, decryptMessageWithUsersPassword } from '../chatroom/chatroom_utils';
 
-const Friend = ({ friendId, friendshipId }) => {
+const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
   const [friendDetails, setFriendDetails] = useState(null);
   const dispatch = useDispatch();
   const user_id = useSelector(selectUser).id;
+
+  // Need to create a socket receive event for when public key change of friend is received
 
   useEffect(() => {
     const fetchFriendDetails = async () => {
@@ -27,6 +30,17 @@ const Friend = ({ friendId, friendshipId }) => {
     };
     fetchFriendDetails();
   }, [friendId]);
+
+  useEffect(() => {
+    if (friendPublicKey === null) {
+      return;
+    }
+    const newFriendData = {
+      ...friendDetails,
+      public_key: friendPublicKey,
+    };
+    setFriendDetails(newFriendData);
+  }, [friendPublicKey]);
 
   const handleDeleteFriend = async (e) => {
     e.stopPropagation();
@@ -51,26 +65,89 @@ const Friend = ({ friendId, friendshipId }) => {
     }
   };
 
+  const deleteMessage = async (message_id) => {
+    await messagesAPI.deleteMessage(message_id);
+    console.log("Delete retrieval message after saving. Message with id ", message_id, " deleted.");
+  }
+
   /* RETRIEVING CHATROOM INFO OR CREATING NEW CHATROOM AND ADDING TO LOCAL SLICE */
-  // Getting messages from chatroom
   const getMessagesFromChatroom = async (chatroom_id) => {
-    const messages = await messagesAPI.getMessagesByChatroomId(chatroom_id);
-    return messages;
+    const final_sorted_messages = [];
+    const messages = await messagesAPI.getMessagesByChatroomId(chatroom_id); // All messages in chatroom
+    console.log("IN FRIEND.JS: All messages in chatroom: ", messages)
+
+    for (const message of messages) {
+
+      if (message.stored_by_id === user_id && message.waiting_for_retrieval === false) { // Messages which are specifically stored by user and encrypted with their password key
+        const decryptedMessage = await decryptMessageWithUsersPassword(message.content);
+        console.log("IN FRIEND.JS: Message which is stored by user, decrypted using user's password key: ", decryptedMessage)
+        const decryptedMessageObject = {
+          id: message.id,
+          chatroom_id: message.chatroom_id,
+          chatroom_index: message.chatroom_index,
+          sender_id: message.sender_id,
+          content: decryptedMessage,
+        };
+        final_sorted_messages.push(decryptedMessageObject);
+      
+      } else if (message.waiting_for_retrieval === true && message.sender_id === friendId) { // Message needs to be retrieved by user and decrypted using users private key
+        console.log("IN FRIEND.JS: Retrieving a message which has been waiting for retrieval\n")
+        const decryptedMessage = await decryptWithPrivateKey(message.content);
+        console.log("IN FRIEND.JS: Message which is waiting for retrieval, decrypted using friend's public key: ", decryptedMessage)
+        const decryptedMessageObject = {
+          id: message.id,
+          chatroom_id: message.chatroom_id,
+          chatroom_index: message.chatroom_index,
+          sender_id: message.sender_id,
+          content: decryptedMessage,
+        };
+        console.log("IN FRIEND.JS: Decrypted message object: ", decryptedMessageObject)
+        // Adding message to final messages array to be added to slice
+        final_sorted_messages.push(decryptedMessageObject);
+        console.log("Retrieved message from database and added to final messages array\n")
+        
+        // Storing message in database encrypted with user's password
+        console.log("Now storing message in database encrypted with user's own password key\n")
+        console.log("Decrypted message in Friend.js: ", decryptedMessage)
+        const message_encrypted_with_users_password = await encryptMessageWithUsersPassword(decryptedMessage);
+        await messagesAPI.createMessage(message.chatroom_id, message.chatroom_index, user_id, friendId, message_encrypted_with_users_password);
+        console.log("IN FRIEND.JS: Have retrieved message and saved it to database encrypted with user's password key. Message was: ", decryptedMessage);
+
+        // Deleting message from database as it has been retrieved
+        deleteMessage(message.id);
+        console.log("IN FRIEND.JS: Deleted old copy of message which I needed to store. Had needed retrieval value of true so retrieved and now deleted.")
+      }
+    }
+
+    console.log("IN FRIEND.JS: Final messages for user, ", final_sorted_messages);
+    return final_sorted_messages;
   };
 
   // Function looks for chatroom we are entering, if it finds it, returns chatroom id and chats within chatroom, otherwise returns null
   const fetchChatroomDataFromDatabase = async (user_id, friend_id) => {
     const usersChatrooms = await chatroomsAPI.getUsersChatrooms(user_id);
+    console.log("On Clicking friend chatrooms for user are: ", usersChatrooms);
+
     if (usersChatrooms.length > 0) {
+      // Looping over all chatrooms which the user is within to find the chatroom we want to enter
       for (const chatroom of usersChatrooms) {
         const cur_chatroom_id = chatroom.id;
         const cur_chatroom_friendId =
           chatroom.host_id === user_id ? chatroom.participant_id : chatroom.host_id;
+
         if (cur_chatroom_friendId === friend_id) {
+          // Found chatroom we are entering
+          console.log("Chatroom we are entering is: ", cur_chatroom_id);
           const messages = await getMessagesFromChatroom(cur_chatroom_id);
+          console.log("Chatroom messages: ", messages, " for chatroom id: ", cur_chatroom_id);
           const chatroom_info = {
             chatroomId: cur_chatroom_id,
-            friendId: friend_id,
+            friend: {
+              id: cur_chatroom_friendId,
+              is_active: friendDetails.is_active,
+              public_key: friendDetails.public_key,
+              username: friendDetails.username,
+            },
             messages: messages,
           };
           return chatroom_info;
@@ -84,9 +161,11 @@ const Friend = ({ friendId, friendshipId }) => {
   const goToChatroom = async () => {
     // First we re-fetch the data for this chatroom - first looking for entry then returning data and assigning slices slot for it
     const existingChatroomInfo = await fetchChatroomDataFromDatabase(user_id, friendId);
+    //console.log("FRIEND INFO: ", friendDetails);
 
     if (existingChatroomInfo === null) {
       // Need to create new chatroom
+      console.log("Creating a new chatroom")
       const new_chatroom = await chatroomsAPI.createChatroom(user_id, friendId); // Creating chatroom in DATABASE
       const chatroom_id = new_chatroom.id;
       dispatch(
@@ -98,10 +177,11 @@ const Friend = ({ friendId, friendshipId }) => {
       );
     } else {
       // Chatroom exists in database
+      console.log("Using an existing chatroom")
       dispatch(
         setChatroom({
           id: existingChatroomInfo.chatroomId,
-          friend_id: existingChatroomInfo.friendId,
+          friend: existingChatroomInfo.friend,
           messages: existingChatroomInfo.messages,
         })
       );

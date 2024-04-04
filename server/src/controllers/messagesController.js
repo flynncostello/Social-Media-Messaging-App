@@ -1,5 +1,30 @@
 const messagesModel = require('../models/messagesModel');
 
+/*
+exports.getMessagesByChatroomIdAndUserId = async (req, res) => {
+    const chatroom_id = req.params.chatroomId;
+    const user_id = req.params.userId;
+    try {
+        const messages = await messagesModel.m_getMessagesByChatroomIdAndUserId(chatroom_id, user_id);
+        res.json(messages);
+    } catch (error) {
+        res.status(404).json({ error: 'Messages not found' });
+    }
+}
+
+exports.getMessagesWaitingForRetrievalByChatroomId = async (req, res) => {
+    const chatroom_id = req.params.chatroomId;
+    const user_id = req.params.userId;
+    try {
+        const messages = await messagesModel.m_getMessagesWaitingForRetrievalByChatroomId(chatroom_id, user_id);
+        res.json(messages);
+    } catch (error) {
+        res.status(404).json({ error: 'Messages not found' });
+    }
+}
+*/
+
+
 exports.getMessagesByChatroomId = async (req, res) => {
     const chatroom_id = req.params.chatroomId;
     

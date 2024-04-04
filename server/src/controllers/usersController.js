@@ -34,6 +34,7 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
     const user_id = req.params.userId;
     const updated_user_info = req.body;
+    console.log("IN CONTROLLER USER INFO: ", updated_user_info)
     try {
         const updated_user = await usersModel.m_updateUser(user_id, updated_user_info);
         res.status(200).json(updated_user);

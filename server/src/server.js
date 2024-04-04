@@ -130,9 +130,38 @@ app.get('/api/logout', (req, res) => {
 const messagesModel = require('./models/messagesModel');
 const m_createMessage = messagesModel.m_createMessage;
 
+const friendsModel = require('./models/friendsModel');
+const usersModel = require('./models/usersModel');
+
+const getAllFriends = async (userId) => {
+  try {
+    // Get an array of friend objects for the given user
+    const friendObjects = await friendsModel.m_getUsersFriends(userId);
+
+    const friends = [];
+
+    // Loop through each friend object and get the user information
+    for (const friendObject of friendObjects) {
+      const friendId = friendObject.friend_id;
+      const friend = await usersModel.m_getUserById(friendId);
+      friends.push(friend);
+    }
+
+    return friends;
+  } catch (error) {
+    console.error('Error fetching friends:', error);
+    throw error;
+  }
+};
+
 /* SOCKET.IO */
 io.on('connection', (socket) => {
   console.log('A user connected');
+
+  // Helper to get socket id
+  socket.on('getSocketId', () => {
+    socket.emit('sendSocketId', { socket_id: socket.id });
+  });
 
   // Join a chat room
   socket.on('join-room', (roomId) => {
@@ -140,20 +169,44 @@ io.on('connection', (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
+  // Update public key
+  socket.on('changePublicKey', async ({ userId, publicKey }) => {
+    const friends = await getAllFriends(userId);
+    console.log("Changing public key and telling all my friends, ", friends);
+
+    friends.forEach(friend => {
+      const friendSocketId = friend.socket_id;
+      if (friendSocketId) {
+        console.log("Sending updated public key to friend with socket_id: ", friendSocketId)
+        io.to(friendSocketId).emit('updatePublicKey', { publicKey });
+      }
+    });
+  });
+
   // Send a new message
   socket.on('send-message', async (data) => {
-    const { roomId, message, senderId, chatroom_index } = data;
-    // Save the message to the database
-    try {
-      const created_message = await m_createMessage({ chatroom_id: roomId, chatroom_index, sender_id: senderId, content: message });
-      console.log("Message saved to database");
-    } catch (error) {
-      console.error("Error saving message to database:", error);
-    }
+    const { roomId, encrypted_message, senderId, chatroom_index } = data;
+    const socketsInRoom = await io.in(roomId).fetchSockets();
+    const num_users_in_room = socketsInRoom.length;
+    console.log(`IN SERVER: Room ${roomId} has ${num_users_in_room} users`);
+    //console.log("IN SERVER: Encrypted message: ", encrypted_message);
 
-    // Broadcast the message to everyone in the room with id = roomId
-    socket.to(roomId).emit('receive-message', { message, senderId, chatroom_index });
-    console.log("Message broadcast to all users in chatroom with id: ", roomId)
+    if (num_users_in_room === 2) { // Both users in room
+      //console.log(`Sending the following information, encrypted message: ${encrypted_message}, senderId: ${senderId}, chatroom_index: ${chatroom_index} to room with id: ${roomId}`);
+      console.log("IN SERVER: Message being sent with chatroom_index: ", chatroom_index)
+      socket.to(roomId).emit('receive-message', { encrypted_message, senderId, chatroom_index });
+      console.log("IN SERVER: Message broadcast over socket in room with id: ", roomId);
+    } else {
+      console.log("IN SERVER: Other user is not in room to receive message so sending to database");
+      // Store encrypted message in database
+      try {
+        // Send with waiting_for_retrieval porperty as true, once friend receives this message delete it as it isn't encrypted with the friend's password
+        await m_createMessage({ chatroom_id: roomId, chatroom_index, sender_id: senderId, content: encrypted_message, waiting_for_retrieval: true}); // stored_by_id = -1, means no one is storing this until it is successfully retrieved next time friend opens chatroom
+        console.log("IN SERVER: Encrypted message saved to database with waiting_for_retrieval as true");
+      } catch (error) {
+        console.error("Error saving message to database:", error);
+      }
+    }
   });
 
   // Leave a chat room

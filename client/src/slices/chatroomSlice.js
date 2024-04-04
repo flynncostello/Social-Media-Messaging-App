@@ -4,15 +4,15 @@ const chatroomsSlice = createSlice({
   name: 'chatroom',
   initialState: {
     id: null,
-    friend_id: null,
+    friend: {}, // Object which stores friend id, is_active, public_key, username
     messages: [], // Array of message objects {id, chatroom_id, chatroom_index, sender_id, content}
   },
 
   reducers: {
     setChatroom: (state, action) => {
-      const { id, friend_id, messages } = action.payload;
+      const { id, friend, messages } = action.payload;
       state.id = id;
-      state.friend_id = friend_id;
+      state.friend = friend;
       state.messages = messages;
     },
     addMessage: (state, action) => {
@@ -21,7 +21,7 @@ const chatroomsSlice = createSlice({
     },
     resetChatroom: (state) => {
       state.id = null;
-      state.friend_id = null;
+      state.friend = {};
       state.messages = [];
     },
   },

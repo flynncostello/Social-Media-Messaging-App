@@ -1,8 +1,56 @@
 const supabase = require('../services/supabaseDatabaseService');
 
 const messagesModel = {
+    /*
+    m_getMessagesByChatroomIdAndUserId: async (chatroom_id, user_id) => {
+        try {
+            const { data, error } = await supabase
+                .from("messages")
+                .select("*")
+                .eq("chatroom_id", chatroom_id)
+                .eq("stored_by_id", user_id)
+                .eq("waiting_for_retrieval", false);
+            if (error) {
+                console.error('Error fetching messages by chatroom ID and user ID:', error);
+                throw new Error('Error fetching messages by chatroom ID and user ID');
+            }
+            return data;
+        } catch (error) {
+            console.error('Error fetching messages by chatroom ID and user ID:', error);
+            throw error;
+        }
+    },  
+
+    m_getMessagesWaitingForRetrievalByChatroomId: async (chatroom_id, user_id) => {
+        try {
+            const { data, error } = await supabase
+                .from("messages")
+                .select("*")
+                .eq("chatroom_id", chatroom_id)
+                .neq("sender_id", user_id)
+                .eq("waiting_for_retrieval", true);
+            if (error) {
+                console.error('Error fetching messages waiting for retrieval by chatroom ID:', error);
+                throw new Error('Error fetching messages waiting for retrieval by chatroom ID');
+            }
+            return data;
+        } catch (error) {
+            console.error('Error fetching messages waiting for retrieval by chatroom ID:', error);
+            throw error;
+        }
+    },
+    */
+    
     m_getMessagesByChatroomId: async (chatroom_id) => {
         try {
+            /*
+            const { data, error } = await supabase
+                .from("messages")
+                .select("*")
+                .eq("chatroom_id", chatroom_id)
+                .eq("sender_id", user_id)
+                .eq("waiting_for_retrieval", false);
+            */
             const { data } = await supabase.from("messages").select("*").eq("chatroom_id", chatroom_id);
             return data;
         } catch (error) {
@@ -27,21 +75,25 @@ const messagesModel = {
     },
 
     m_createMessage: async (message_info) => {
-        const { chatroom_id, chatroom_index, sender_id, content } = message_info;
+        const { chatroom_id, chatroom_index, stored_by_id, sender_id, content, waiting_for_retrieval = false } = message_info;
         try {
+            const messageToInsert = { chatroom_id, chatroom_index, sender_id, content, waiting_for_retrieval };
+            if (stored_by_id) {
+                messageToInsert.stored_by_id = stored_by_id;
+            }
             const { data, error } = await supabase
                 .from("messages")
-                .insert([{ chatroom_id, chatroom_index, sender_id, content }])
+                .insert([messageToInsert])
                 .select();
             
             if (error) {
                 console.error('Error creating new message:', error);
                 throw new Error('Error creating new message');
             }
-
+    
             const created_message = data[0];
             return created_message;
-
+    
         } catch (error) {
             console.error('Error creating new message:', error);
             throw error;

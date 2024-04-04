@@ -23,8 +23,10 @@ const userAPI = {
     }
   },
   updateUser: async (user_id, user_info) => {
+    const updatedUserInfo = {...user_info, socket_id: user_info.socket_id};
+    console.log("IN API USER INFO: ", updatedUserInfo)
     try {
-      const response = await axios.put(`${API_ENDPOINT}/users/${user_id}`, user_info);
+      const response = await axios.put(`${API_ENDPOINT}/users/${user_id}`, updatedUserInfo);
       //console.log("FRONTEND API, RESPONSE FROM UPDATE USER: ", response.data)
       return response;
     } catch (error) {

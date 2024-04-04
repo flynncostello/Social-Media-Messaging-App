@@ -8,10 +8,11 @@ import { selectChatroom, addMessage, resetChatroom } from '../../../slices/chatr
 
 import chatroomsAPI from '../../../api/chatrooms';
 import messagesAPI from '../../../api/messages';
+import { decryptWithPrivateKey, encryptWithReceiversPublicKey, encryptMessageWithUsersPassword } from './chatroom_utils';
 import './Chatroom.css';
 
 import io from 'socket.io-client';
-const socket = io('http://localhost:3000');
+import { socket } from '../../../components/login/Login';
 
 const Chatroom = () => {
   const [message, setMessage] = useState('');
@@ -19,10 +20,27 @@ const Chatroom = () => {
   const user_id = useSelector(selectUser).id;
 
   const chatroom_id = useSelector(selectChatroom).id || null;
-  const chatroom_friend_id = useSelector(selectChatroom).friend_id || null;
+  const chatroom_friend = useSelector(selectChatroom).friend || {};
   const chatroom_messages = useSelector(selectChatroom).messages || [];
 
   const dispatch = useDispatch();
+
+
+  // Handles sending message to database
+  const sendMessageToDatabase = async (chatroom_id, message, stored_by_id, sender_id, chatroom_index) => {
+    try {
+      console.log(`All info being sent to database for message:
+      Chatroom ID: ${chatroom_id}
+      Message: ${message}
+      Stored By ID: ${stored_by_id}
+      Sender ID: ${sender_id}
+      Chatroom Index: ${chatroom_index}`);
+      const created_message = await messagesAPI.createMessage(chatroom_id, chatroom_index, stored_by_id, sender_id, message);
+      console.log("Message saved to database");
+    } catch (error) {
+      console.error("Error saving message to database:", error);
+    }
+  }
 
   // SETTING UP CONNECTION TO CHATROOM //
   useEffect(() => {
@@ -32,10 +50,27 @@ const Chatroom = () => {
 
       // Listen for incoming messages
       socket.on('receive-message', (data) => {
-        const { message, senderId, chatroom_index } = data; // Message is string text i.e., content
-        // Update the Redux store with the received message
-        console.log(`Received message ${message} from sender ${senderId} in chatroom ${chatroom_id} at index ${chatroom_index}`)
-        dispatch(addMessage({ chatroom_id: chatroom_id,  chatroom_index, sender_id: senderId, content: message }));
+        const handleReceivedMessage = async () => {
+          const { encrypted_message, senderId, chatroom_index } = data; // Message is string text i.e., content
+          // Decrypting message using private key
+          //console.log("Information received from socket, encrypted message: ", encrypted_message, "senderId: ", senderId, "chatroom_index: ", chatroom_index);
+          const decryptedMessage = await decryptWithPrivateKey(encrypted_message);
+          console.log("Decrypted message on receivers end: ", decryptedMessage)
+          
+          // Update the Redux store with the received message
+          console.log(`Received message ${decryptedMessage} from sender ${senderId} in chatroom ${chatroom_id} at index ${chatroom_index}`)
+          dispatch(addMessage({ chatroom_id: chatroom_id,  chatroom_index, sender_id: senderId, content: decryptedMessage }));
+          
+          // Storing message in database encrypted with user's password
+          const message_encrypted_with_users_password = await encryptMessageWithUsersPassword(decryptedMessage);
+          //console.log("Message encrypted with user's password: ", message_encrypted_with_users_password)
+          console.log("Message index of received message being added to users personal messages: ", chatroom_index)
+
+          // Sender id for received message is user as we just want one entire set of messages received or sent for each user
+          sendMessageToDatabase(chatroom_id, message_encrypted_with_users_password, user_id, chatroom_friend.id, chatroom_index); // Posting message to database
+        };
+
+        handleReceivedMessage();
       });
     }
     // Clean up event listeners when the component unmounts or when the chatroom changes
@@ -46,38 +81,39 @@ const Chatroom = () => {
 
   }, [chatroom_id]);
 
-  // Handles sending message to database
-  const sendMessageToDatabase = async (chatroom_id, message, sender_id, chatroom_index) => {
-    try {
-      const created_message = await messagesAPI.createMessage({ chatroom_id, chatroom_index, sender_id, content: message });
-      console.log("Message saved to database");
-    } catch (error) {
-      console.error("Error saving message to database:", error);
-    }
-  }
 
   // SUBMITTING A MESSAGE //
-  const handleSubmitMessage = (event) => {
+  const handleSubmitMessage = async (event) => {
+    if (message.trim() === '') {
+      alert('Please enter a message');
+      return;
+    };
+
     event.preventDefault();
+    console.log("Sending message now...")
 
-    const isFriendOnline = true;
     const message_index = chatroom_messages.length
+    console.log("New message index: ", message_index)
 
-    if (isFriendOnline) {
-      // First adding message to users local chatroom slice
-      dispatch(addMessage({ chatroom_id: chatroom_id,  chatroom_index: message_index, sender_id: user_id, content: message }));
+    // ADDING MESSAGE PLAINTEXT TO SLICE //
+    dispatch(addMessage({ chatroom_id: chatroom_id,  chatroom_index: message_index, sender_id: user_id, content: message }));
+    console.log("Message added to local slice")
 
-      // Send the message through the socket
-      socket.emit('send-message', { roomId: chatroom_id, message, senderId: user_id, chatroom_index: message_index });
+    // SENDING MESSAGE ENCRYPTED WITH RECEIVER'S PUBLIC KEY TO RECEIVER //
+    const message_encrypted_with_receivers_public_key = await encryptWithReceiversPublicKey(message, chatroom_friend.public_key);
+    console.log("Encrypting message being sent with receiver's public key: ", chatroom_friend.public_key)
+    //console.log("Encrypted message with receiver's public key: ", message_encrypted_with_receivers_public_key);
+    socket.emit('send-message', { roomId: chatroom_id, encrypted_message: message_encrypted_with_receivers_public_key, senderId: user_id, chatroom_index: message_index });
+    console.log("Sent message over socket to friend");
 
-      // Clear the message input
-      setMessage('');
-    } else {
-      alert('Friend is not online');
-      // Just post new message to database for later retrieval
-      // When one of the users goes offline dont need to post entire chatroom again (as we've been posting chats as we go), just clear slice ready for next chatroom to be accessed
-      sendMessageToDatabase(chatroom_id, message, user_id, message_index); // Posting message to database
-    }
+    // STORING MESSAGE ENCRYPTED WITH USER'S PASSWORD IN DATABASE //
+    console.log("Adding entry in database for message encrypted with user's password as personal entry to retrieve when opening chatroom later")
+    const message_encrypted_with_users_password = await encryptMessageWithUsersPassword(message);
+    //console.log("Message encrypted with user's password: ", message_encrypted_with_users_password)
+    sendMessageToDatabase(chatroom_id, message_encrypted_with_users_password, user_id, user_id, message_index); // Posting message to database
+    console.log("Message being sent by user has also been encrypted with user's saved to database")
+  
+    setMessage('');
   };
 
     // LEAVING CHAT //
@@ -91,7 +127,7 @@ const Chatroom = () => {
       <div className='chatroom-container'>
           {/* Chatroom */}
           <button onClick={handleLeaveChat}>Leave Chat</button>
-          <p>Entering Chatroom with id: {chatroom_id} and friendId: {chatroom_friend_id}</p>
+          <p>Entering Chatroom with id: {chatroom_id} and friendId: {chatroom_friend.id}</p>
           <div className='chats-container'>
             {chatroom_messages.length > 0 && [...chatroom_messages].sort((a, b) => a.chatroom_index - b.chatroom_index)
               .map((obj, index) => (

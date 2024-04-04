@@ -5,6 +5,49 @@ import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
 import axios from 'axios';
 import userAPI from '../../api/user';
+//import crypto from 'crypto';
+import { Buffer } from 'buffer';
+
+import io from 'socket.io-client';
+export const socket = io('http://localhost:3000');
+
+const derivePasswordEncryptionKey = async (password) => {
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
+
+    // Use a constant salt
+    const salt = new TextEncoder().encode('S0m3C0mpl3xStr1ng');
+
+    const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        passwordBuffer,
+        { name: 'PBKDF2' },
+        false,
+        ['deriveBits', 'deriveKey']
+    );
+
+    const encryptionKey = await crypto.subtle.deriveKey(
+        {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+        },
+        keyMaterial,
+        { name: 'AES-CBC', length: 256 },
+        true,
+        ['encrypt', 'decrypt']
+    );
+
+    // Store the encryption key in localStorage
+    const exportedEncryptionKey = await crypto.subtle.exportKey('raw', encryptionKey);
+    const encryptionKeyStr = Buffer.from(new Uint8Array(exportedEncryptionKey)).toString('hex');
+    localStorage.setItem('userEncryptionKey', encryptionKeyStr); // Sets encryption key in local storage for symmetric encryption
+
+    //return encryptionKeyStr;
+};
+
+
 
 const Login = () => {
     const [loginUsername, setLoginUsername] = useState('');
@@ -20,6 +63,9 @@ const Login = () => {
             const data = response.data;
 
             if (data.success) {
+                // Deriving encryption key from password and storing in localStorage
+                derivePasswordEncryptionKey(loginPassword);
+
                 const user_data = data.user;
                 user_data.is_active = true;
 
@@ -59,10 +105,33 @@ const Login = () => {
                 // Add public key to user data
                 user_data.public_key = publicKeyString;
 
-                dispatch(setUser(user_data));
-                userAPI.updateUser(user_data.id, user_data);
+                // Getting socket id
+                new Promise((resolve, reject) => {
+                    // Emit
+                    socket.emit('getSocketId');
 
-                navigate(ROUTES.dashboard(user_data.id));
+                    // Receive
+                    socket.once('sendSocketId', ({ socket_id }) => {
+                        console.log("Received socket id: ", socket_id);
+                        user_data.socket_id = socket_id;
+                        resolve(socket_id);
+                    });
+
+                })
+                .then(socket_id => {
+                    console.log("Promise resolved with socket id: ", socket_id);
+                    console.log("User data socket id: ", user_data.socket_id);
+                    console.log("Adding user info to slice")
+                    dispatch(setUser(user_data)); // Sending data to redux slice
+                    console.log("Sending user info to database, user info: ", user_data)
+                    userAPI.updateUser(user_data.id, user_data); // Sending data to database
+
+                    // Sending a 'reminder' for all other users to update the public key of this user
+                    socket.emit('changePublicKey', { userId: user_data.id, publicKey: user_data.public_key });
+
+                    navigate(ROUTES.dashboard(user_data.id));
+                })
+               
             } else {
                 alert(`Login failed: ${data.message}`);
             }
