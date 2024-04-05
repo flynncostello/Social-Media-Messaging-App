@@ -4,7 +4,7 @@ import { faComments } from '@fortawesome/free-solid-svg-icons';
 
 import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../../../slices/userSlice";
-import { selectChatroom, addMessage, resetChatroom } from '../../../slices/chatroomSlice';
+import { selectChatroom, updateFriendPublicKey, addMessage, resetChatroom } from '../../../slices/chatroomSlice';
 
 import chatroomsAPI from '../../../api/chatrooms';
 import messagesAPI from '../../../api/messages';
@@ -16,6 +16,7 @@ import { socket } from '../../../components/login/Login';
 
 const Chatroom = () => {
   const [message, setMessage] = useState('');
+  const [lockingChatroom, setLockingChatroom] = useState(false);
 
   const user_id = useSelector(selectUser).id;
 
@@ -45,6 +46,7 @@ const Chatroom = () => {
   // SETTING UP CONNECTION TO CHATROOM //
   useEffect(() => {
     if (chatroom_id !== null) {
+      console.log("MOVING TO NEW CHATROOM")
       // Join the chat room socket
       socket.emit('join-room', chatroom_id);
 
@@ -72,7 +74,29 @@ const Chatroom = () => {
 
         handleReceivedMessage();
       });
+
+      // Listen for 'updatePublicKey' event from the server
+      const updatePublicKeyHandler = ({ userId, publicKey }) => {
+        const cur_friend_id = userId
+        console.log("I am within the chatroom (i.e., chatroom is being held open) and need to update user ", userId, ", public key with with new public key: ", publicKey);
+        dispatch(updateFriendPublicKey(publicKey));
+        console.log("Check redux, I have updated the user's friends public key for this chatroom")
+      };
+      socket.on('updatePublicKey', updatePublicKeyHandler);
+      console.log("Mounted socket event listener for updatePublicKey ON CHATROOM");
+
+      // Adding event listener for restricting chatrooms when other users are offline
+      const closeChatroomHandler = ({ userId }) => {
+        console.log("Closing chatroom as other user is offline")
+        alert('Closing chatroom as friend is offline.')
+        setLockingChatroom(true);
+        dispatch(resetChatroom());
+      }
+      socket.on('closeChatroom', closeChatroomHandler);
+      console.log("Mounted socket event listener for closeChatroom ON CHATROOM")
     }
+
+
     // Clean up event listeners when the component unmounts or when the chatroom changes
     return () => {
       socket.off('receive-message');

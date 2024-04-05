@@ -15,6 +15,10 @@ const chatroomsSlice = createSlice({
       state.friend = friend;
       state.messages = messages;
     },
+    updateFriendPublicKey: (state, action) => {
+      const public_key = action.payload;
+      state.friend.public_key = public_key;
+    },
     addMessage: (state, action) => {
       const message = action.payload; // Object
       state.messages.push(message);
@@ -27,6 +31,6 @@ const chatroomsSlice = createSlice({
   },
 });
 
-export const { setChatroom, addMessage, resetChatroom } = chatroomsSlice.actions;
+export const { setChatroom, updateFriendPublicKey, addMessage, resetChatroom } = chatroomsSlice.actions;
 export const selectChatroom = (state) => state.chatroom || {};
 export default chatroomsSlice.reducer;

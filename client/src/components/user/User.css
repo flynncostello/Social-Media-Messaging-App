@@ -24,6 +24,7 @@
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Add shadow to dropdown */
     padding: 10px; /* Add padding inside the dropdown */
     margin-top: 5px;
+    z-index: 10;
 }
 
 .dropdown a {

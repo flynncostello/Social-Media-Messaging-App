@@ -137,7 +137,8 @@ const getAllFriends = async (userId) => {
   try {
     // Get an array of friend objects for the given user
     const friendObjects = await friendsModel.m_getUsersFriends(userId);
-
+    console.log("user id: ", userId)
+    console.log("Friends found: ", friendObjects)
     const friends = [];
 
     // Loop through each friend object and get the user information
@@ -169,18 +170,53 @@ io.on('connection', (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
+  // Logger for socket events
+  app.use((req, res, next) => {
+    const originalEmit = res.io.emit;
+    res.io.emit = function() {
+      console.log('Event emitted:', arguments);
+      return originalEmit.apply(this, arguments);
+    };
+    next();
+  });  
+
   // Update public key
   socket.on('changePublicKey', async ({ userId, publicKey }) => {
     const friends = await getAllFriends(userId);
     console.log("Changing public key and telling all my friends, ", friends);
-
+    console.log("New Public key is: ", publicKey);
     friends.forEach(friend => {
       const friendSocketId = friend.socket_id;
       if (friendSocketId) {
-        console.log("Sending updated public key to friend with socket_id: ", friendSocketId)
-        io.to(friendSocketId).emit('updatePublicKey', { publicKey });
+        console.log("Sending updated public key to friend with socket_id: ", friendSocketId);
+        io.to(friendSocketId).emit('updatePublicKey', { publicKey, userId });
+      } else {
+        console.log("Friend socket_id not available for friend with id: ", friend.id);
       }
     });
+  });
+
+  // Restricting chats
+  socket.on('closeChats', async ({ userId }) => {
+    try {
+      console.log("CLOSING ALL CHATS")
+      // Get all the friends of the user who logged out
+      const friends = await getAllFriends(userId);
+      console.log("CLOSING, friends which need to close chats include: ", friends)
+
+      // Iterate through the friends and emit the 'closeChatroom' event to each of them
+      friends.forEach(friend => {
+        const friendSocketId = friend.socket_id;
+        if (friendSocketId) {
+          console.log(`Sending 'closeChatroom' event to friend with socket_id: ${friendSocketId}`);
+          io.to(friendSocketId).emit('closeChatroom', { userId });
+        } else {
+          console.log(`Friend socket_id not available for friend with id: ${friend.id}`);
+        }
+      });
+    } catch (error) {
+      console.error('Error handling closeChats event:', error);
+    }
   });
 
   // Send a new message

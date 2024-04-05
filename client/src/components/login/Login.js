@@ -112,15 +112,13 @@ const Login = () => {
 
                     // Receive
                     socket.once('sendSocketId', ({ socket_id }) => {
-                        console.log("Received socket id: ", socket_id);
+                        console.log("During login called get socket id and received my personal socket id: ", socket_id);
                         user_data.socket_id = socket_id;
                         resolve(socket_id);
                     });
 
                 })
                 .then(socket_id => {
-                    console.log("Promise resolved with socket id: ", socket_id);
-                    console.log("User data socket id: ", user_data.socket_id);
                     console.log("Adding user info to slice")
                     dispatch(setUser(user_data)); // Sending data to redux slice
                     console.log("Sending user info to database, user info: ", user_data)

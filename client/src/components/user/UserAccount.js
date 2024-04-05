@@ -17,6 +17,8 @@ Process:
 - When user logs out it simply changes is_active state in database and clears all slices
 */
 
+import { socket } from '../login/Login';
+
 
 const UserAccount = () => {
   const dispatch = useDispatch();
@@ -35,6 +37,8 @@ const UserAccount = () => {
           dispatch(clearRequests()); // Clear friend requests slice
           dispatch(resetChatroom()); // Clear chatroom slice
           navigate('/');
+
+          socket.emit('closeChats', { userId: user.id }); // Restrict chats for user
         })
         .catch((error) => {
           console.error('Error deleting account:', error);

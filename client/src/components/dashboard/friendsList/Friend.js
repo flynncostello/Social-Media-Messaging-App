@@ -8,7 +8,7 @@ import friendsAPI from '../../../api/friends';
 import chatroomsAPI from '../../../api/chatrooms';
 import { removeFriend } from '../../../slices/friendsSlice';
 import { selectUser } from '../../../slices/userSlice';
-import { setChatroom } from '../../../slices/chatroomSlice';
+import { setChatroom, resetChatroom } from '../../../slices/chatroomSlice';
 import messagesAPI from '../../../api/messages';
 import { decryptWithPrivateKey, encryptMessageWithUsersPassword, decryptMessageWithUsersPassword } from '../chatroom/chatroom_utils';
 
@@ -32,15 +32,22 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
   }, [friendId]);
 
   useEffect(() => {
+    console.log("Inside friend, updating friend details friend public key with new public key: ", friendPublicKey);
     if (friendPublicKey === null) {
+      console.log("Public key hasn't changed so do nothing")
       return;
     }
+    console.log("Old public key I stored was: ", friendDetails.public_key);
+    console.log("Public key has been updated to update friend data in local slice");
     const newFriendData = {
       ...friendDetails,
       public_key: friendPublicKey,
     };
+    console.log("New public key I store for friend is: ", friendPublicKey);
+    console.log("Updated friend details: ", newFriendData);
     setFriendDetails(newFriendData);
   }, [friendPublicKey]);
+
 
   const handleDeleteFriend = async (e) => {
     e.stopPropagation();
@@ -161,30 +168,43 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
   const goToChatroom = async () => {
     // First we re-fetch the data for this chatroom - first looking for entry then returning data and assigning slices slot for it
     const existingChatroomInfo = await fetchChatroomDataFromDatabase(user_id, friendId);
-    //console.log("FRIEND INFO: ", friendDetails);
+    const friendInfo = await userAPI.getUser(friendId);
+    const friend_is_active = friendInfo.is_active;
 
-    if (existingChatroomInfo === null) {
-      // Need to create new chatroom
-      console.log("Creating a new chatroom")
-      const new_chatroom = await chatroomsAPI.createChatroom(user_id, friendId); // Creating chatroom in DATABASE
-      const chatroom_id = new_chatroom.id;
-      dispatch(
-        setChatroom({
-          id: chatroom_id,
-          friend_id: friendId,
-          messages: [],
-        })
-      );
+    //console.log("FRIEND INFO: ", friendDetails);
+    if (friend_is_active) {
+      if (existingChatroomInfo === null) {
+        // Need to create new chatroom
+        console.log("Creating a new chatroom")
+        const new_chatroom = await chatroomsAPI.createChatroom(user_id, friendId); // Creating chatroom in DATABASE
+        const chatroom_id = new_chatroom.id;
+        console.log("New room friend details are id: ", friendId, " and public key: ", friendDetails.public_key);
+        dispatch(
+          setChatroom({
+            id: chatroom_id,
+            friend: {
+              id: friendId,
+              is_active: friendDetails.is_active,
+              public_key: friendDetails.public_key,
+              username: friendDetails.username,
+            },
+            messages: [],
+          })
+        );
+      } else {
+        // Chatroom exists in database
+        console.log("Using an existing chatroom")
+        dispatch(
+          setChatroom({
+            id: existingChatroomInfo.chatroomId,
+            friend: existingChatroomInfo.friend,
+            messages: existingChatroomInfo.messages,
+          })
+        );
+      }
     } else {
-      // Chatroom exists in database
-      console.log("Using an existing chatroom")
-      dispatch(
-        setChatroom({
-          id: existingChatroomInfo.chatroomId,
-          friend: existingChatroomInfo.friend,
-          messages: existingChatroomInfo.messages,
-        })
-      );
+      alert("This friend is not active and cannot be messaged");
+      dispatch(resetChatroom());
     }
   };
 
