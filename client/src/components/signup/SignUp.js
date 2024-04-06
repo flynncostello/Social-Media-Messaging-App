@@ -22,7 +22,7 @@ const Signup = () => {
         e.preventDefault();
         try {
             const saltRounds = 10;
-            const hashedPassword = bcrypt.hashSync(signupPassword, saltRounds);
+            const hashedPassword = bcrypt.hashSync(signupPassword, saltRounds); // Hashing password using 10 salt rounds
 
             const response = await axios.post('http://localhost:3000/api/signup', {
                 username: signupUsername,
@@ -35,8 +35,8 @@ const Signup = () => {
                 navigate(ROUTES.login()); // Redirect to login page
             } else {
                 // Unexpected error
-                console.error('SIGN UP ERROR:', response.data);
-                alert('Signup failed:', response.data.error || 'Unknown error');
+                console.error('SIGN UP ERROR:', response.data.error);
+                alert(response.data.error);
             }
 
         } catch (error) {
@@ -52,11 +52,11 @@ const Signup = () => {
             <form onSubmit={handleSignup}>
                 <label>
                     Username:
-                    <input type="text" value={signupUsername} onChange={e => setSignupUsername(e.target.value)} />
+                    <input required type="text" value={signupUsername} onChange={e => setSignupUsername(e.target.value)} />
                 </label>
                 <label>
                     Password:
-                    <input type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} />
+                    <input required type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} />
                 </label>
                 <input type="submit" value="Submit" />
             </form>

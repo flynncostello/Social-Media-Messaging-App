@@ -19,7 +19,6 @@ Process:
 
 import { socket } from '../login/Login';
 
-
 const UserAccount = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

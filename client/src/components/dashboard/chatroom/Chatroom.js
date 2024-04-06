@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../../../slices/userSlice";
 import { selectChatroom, updateFriendPublicKey, addMessage, resetChatroom } from '../../../slices/chatroomSlice';
 
+import userAPI from '../../../api/user';
 import chatroomsAPI from '../../../api/chatrooms';
 import messagesAPI from '../../../api/messages';
 import { decryptWithPrivateKey, encryptWithReceiversPublicKey, encryptMessageWithUsersPassword } from './chatroom_utils';
@@ -75,6 +76,7 @@ const Chatroom = () => {
         handleReceivedMessage();
       });
 
+      /*
       // Listen for 'updatePublicKey' event from the server
       const updatePublicKeyHandler = ({ userId, publicKey }) => {
         const cur_friend_id = userId
@@ -84,16 +86,19 @@ const Chatroom = () => {
       };
       socket.on('updatePublicKey', updatePublicKeyHandler);
       console.log("Mounted socket event listener for updatePublicKey ON CHATROOM");
+      
 
       // Adding event listener for restricting chatrooms when other users are offline
       const closeChatroomHandler = ({ userId }) => {
         console.log("Closing chatroom as other user is offline")
-        alert('Closing chatroom as friend is offline.')
+        //alert('Closing chatroom as friend is offline.')
+
         setLockingChatroom(true);
         dispatch(resetChatroom());
       }
       socket.on('closeChatroom', closeChatroomHandler);
       console.log("Mounted socket event listener for closeChatroom ON CHATROOM")
+      */
     }
 
 
@@ -108,12 +113,28 @@ const Chatroom = () => {
 
   // SUBMITTING A MESSAGE //
   const handleSubmitMessage = async (event) => {
+    event.preventDefault();
+
+    // First check friend is active
+    const friend_id = chatroom_friend.id;
+    console.log("Friend id: ", friend_id)
+    const up_to_date_friend_details = await userAPI.getUser(friend_id);
+    console.log("Current friend details at time of sending this message: ", up_to_date_friend_details);
+    if (!up_to_date_friend_details.is_active) {
+      console.log("Closing chatroom as other user is offline")
+      alert('Friend is offline. Unable to send messages until they return. Closing chatroom for now...');
+      setLockingChatroom(true);
+      dispatch(resetChatroom());
+      return;
+    }
+
+    // Next check if message is empty
     if (message.trim() === '') {
       alert('Please enter a message');
       return;
     };
 
-    event.preventDefault();
+    // Now send message
     console.log("Sending message now...")
 
     const message_index = chatroom_messages.length

@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 export const encryptWithReceiversPublicKey = async (message, friendsPublicKey) => {
     const encoder = new TextEncoder();
     const messageData = encoder.encode(message);
-    console.log('a')
+    //console.log('a')
     console.log('Friends public key: ', friendsPublicKey)
     console.log(typeof friendsPublicKey);
 
@@ -18,7 +18,7 @@ export const encryptWithReceiversPublicKey = async (message, friendsPublicKey) =
         true,
         ['encrypt']
     );
-    console.log('b')
+    //console.log('b')
 
     const encryptedData = await crypto.subtle.encrypt(
         {
@@ -27,10 +27,10 @@ export const encryptWithReceiversPublicKey = async (message, friendsPublicKey) =
         importedPublicKey,
         messageData
     );
-    console.log('c')
+    //console.log('c')
 
     const encryptedMessage = Buffer.from(new Uint8Array(encryptedData)).toString('hex');
-    console.log('d');
+    //console.log('d');
     return encryptedMessage;
 };
 
@@ -97,11 +97,11 @@ export const encryptMessageWithUsersPassword = async (message) => {
 // Decrypts message using the user's password-derived encryption key
 export const decryptMessageWithUsersPassword = async (encryptedMessage) => {
     const encryptionKeyStr = localStorage.getItem('userEncryptionKey');
-    console.log("1")
+    //console.log("1")
     if (!encryptionKeyStr) {
       throw new Error('User encryption key not found in localStorage');
     }
-    console.log("2")
+    //console.log("2")
   
     const encryptionKey = await crypto.subtle.importKey(
       'raw',
@@ -110,19 +110,19 @@ export const decryptMessageWithUsersPassword = async (encryptedMessage) => {
       true,
       ['encrypt', 'decrypt']
     );
-    console.log("3")
+    //console.log("3")
 
     const [ivHex, encryptedDataHex] = encryptedMessage.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const encryptedData = Buffer.from(encryptedDataHex, 'hex');
-    console.log("4")
+    //console.log("4")
 
     const decryptedData = await crypto.subtle.decrypt(
       { name: 'AES-CBC', iv: iv },
       encryptionKey,
       encryptedData
     );
-    console.log("5")
+    //console.log("5")
 
     const decoder = new TextDecoder();
     const decryptedMessage = decoder.decode(new Uint8Array(decryptedData));

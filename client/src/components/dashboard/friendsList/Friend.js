@@ -12,6 +12,8 @@ import { setChatroom, resetChatroom } from '../../../slices/chatroomSlice';
 import messagesAPI from '../../../api/messages';
 import { decryptWithPrivateKey, encryptMessageWithUsersPassword, decryptMessageWithUsersPassword } from '../chatroom/chatroom_utils';
 
+import { socket } from '../../../components/login/Login';
+
 const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
   const [friendDetails, setFriendDetails] = useState(null);
   const dispatch = useDispatch();
@@ -29,7 +31,23 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
       }
     };
     fetchFriendDetails();
+
+    /*
+    // Listen for 'updatePublicKey' event from the server
+    const updatePublicKeyHandler = ({ userId, publicKey }) => {
+      const cur_friend_id = userId
+      console.log("I am within the chatroom (i.e., chatroom is being held open) and need to update user ", userId, ", public key with with new public key: ", publicKey);
+      const newFriendData = {
+        ...friendDetails,
+        public_key: publicKey,
+      };
+      setFriendDetails(newFriendData);
+    };
+    socket.on('updatePublicKey', updatePublicKeyHandler);
+    console.log("Mounted socket event listener for updatePublicKey ON FRIEND");
+    */
   }, [friendId]);
+
 
   useEffect(() => {
     console.log("Inside friend, updating friend details friend public key with new public key: ", friendPublicKey);
@@ -166,13 +184,15 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
 
   // Moving to new chatroom by either accessing existing chatroom or creating new one
   const goToChatroom = async () => {
-    // First we re-fetch the data for this chatroom - first looking for entry then returning data and assigning slices slot for it
-    const existingChatroomInfo = await fetchChatroomDataFromDatabase(user_id, friendId);
+    // First we get the friends info and check if they are online
     const friendInfo = await userAPI.getUser(friendId);
+    setFriendDetails(friendInfo);
     const friend_is_active = friendInfo.is_active;
 
     //console.log("FRIEND INFO: ", friendDetails);
     if (friend_is_active) {
+        // First we re-fetch the data for this chatroom - first looking for entry then returning data and assigning slices slot for it
+      const existingChatroomInfo = await fetchChatroomDataFromDatabase(user_id, friendId);
       if (existingChatroomInfo === null) {
         // Need to create new chatroom
         console.log("Creating a new chatroom")
@@ -183,10 +203,10 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
           setChatroom({
             id: chatroom_id,
             friend: {
-              id: friendId,
-              is_active: friendDetails.is_active,
-              public_key: friendDetails.public_key,
-              username: friendDetails.username,
+              id: friendInfo.id,
+              is_active: friendInfo.is_active,
+              public_key: friendInfo.public_key,
+              username: friendInfo.username,
             },
             messages: [],
           })
@@ -197,7 +217,12 @@ const Friend = ({ friendId, friendshipId, friendPublicKey }) => {
         dispatch(
           setChatroom({
             id: existingChatroomInfo.chatroomId,
-            friend: existingChatroomInfo.friend,
+            friend: {
+              id: friendInfo.id,
+              is_active: friendInfo.is_active,
+              public_key: friendInfo.public_key,
+              username: friendInfo.username,
+            },
             messages: existingChatroomInfo.messages,
           })
         );

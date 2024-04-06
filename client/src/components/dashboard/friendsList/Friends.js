@@ -46,6 +46,7 @@ const Friends = () => {
   
     fetchFriends();
 
+    /*
     // Listen for 'updatePublicKey' event from the server
     const updatePublicKeyHandler = ({ userId, publicKey }) => {
       const cur_friend_id = userId
@@ -56,6 +57,7 @@ const Friends = () => {
 
     socket.on('updatePublicKey', updatePublicKeyHandler);
     console.log("Mounted socket event listener for updatePublicKey");
+    */
   }, [user.id]);
 
   const friendships = useSelector(selectFriends); // Makes it so that if friends slice changes then this componenet authomatically re-renders

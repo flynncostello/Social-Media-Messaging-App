@@ -1,4 +1,6 @@
 require("dotenv").config();
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const cors = require('cors');
 const logger = require('morgan');
@@ -14,21 +16,30 @@ const friendsRouter = require("./routes/friendsRouter");
 const friend_requestsRouter = require("./routes/friend_requestsRouter");
 const chatroomsRouter = require("./routes/chatroomsRouter");
 const messagesRouter = require("./routes/messagesRouter");
-const http = require('http');
 const { Server } = require('socket.io');
 
 /* SETTING UP SERVER */
 initializePassport(passport);
 const app = express();
 
-const server = http.createServer(app);
+// Load the SSL/TLS certificate files
+const privateKeyPath = path.join(__dirname, 'chatApp.key');
+const certificatePath = path.join(__dirname, 'chatApp.crt');
+
+const credentials = {
+  key: fs.readFileSync(privateKeyPath, 'utf8'),
+  cert: fs.readFileSync(certificatePath, 'utf8')
+};
+
+const server = https.createServer(credentials, app);
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3001', 'http://localhost:3002'],
+    origin: ['https://localhost:3001', 'https://localhost:3002'],
     methods: ['GET', 'POST'],
     credentials: true,
   },
 });
+
 
 const secretKey = crypto.randomBytes(64).toString('hex'); // Secret key for app session
 
@@ -39,7 +50,7 @@ app.use(
       // Allow requests with no origin 
       // (like mobile apps or curl requests)
       if(!origin) return callback(null, true);
-      if(['http://localhost:3001', 'http://localhost:3002'].indexOf(origin) !== -1){
+      if(['https://localhost:3001', 'https://localhost:3002'].indexOf(origin) !== -1){
          callback(null, true)
       } else {
          callback(new Error('Not allowed by CORS'))
@@ -49,11 +60,9 @@ app.use(
   }),
   session({
     secret: secretKey,
-    cookie: { maxAge: 3000000 },
+    cookie: { maxAge: 3000000, secure: true, sameSite: 'none' },
     resave: false,
     saveUninitialized: false,
-    sameSite: 'none',
-    secure: true,
   })
 );
 
@@ -102,7 +111,7 @@ app.post('/api/signup', async (req, res) => {
   console.log("HASH PASSWORD FOR SIGN UP, ", hashedPassword)
   if (userExists.data.length > 0) {
     console.log("Username already exists")
-    return res.status(400).json({ error: 'Username already exists' });
+    return res.json({ error: 'Username already exists' });
   }
   console.log("Username is valid")
 
@@ -180,6 +189,7 @@ io.on('connection', (socket) => {
     next();
   });  
 
+  /*
   // Update public key
   socket.on('changePublicKey', async ({ userId, publicKey }) => {
     const friends = await getAllFriends(userId);
@@ -218,6 +228,7 @@ io.on('connection', (socket) => {
       console.error('Error handling closeChats event:', error);
     }
   });
+  */
 
   // Send a new message
   socket.on('send-message', async (data) => {
