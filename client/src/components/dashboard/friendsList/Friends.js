@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../slices/userSlice';
 
@@ -10,13 +10,8 @@ import { useDispatch } from 'react-redux';
 
 import './Friends.css';
 
-import io from 'socket.io-client';
-import { socket } from '../../login/Login';
 
 const Friends = () => {
-  const [friendIdBeingUpdate, setFriendIdBeingUpdayed] = useState(null);
-  const [newFriendPublicKey, setNewFriendPublicKey] = useState(null);
-
   let fetchedFriendsData = false;
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -27,15 +22,7 @@ const Friends = () => {
         if (!fetchedFriendsData && user.is_active) {
           fetchedFriendsData = true
           const friendsData = await friendsAPI.getFriends(user.id);
-          /*
-          friendsData = [
-            {
-              id: "243tgdhfdfg"
-              user_id: "z2f234g3erdg"
-              friend_id: "a3sgt4w32r"
-            }
-          ]
-          */
+
           dispatch(clearFriendsSlice());
           dispatch(setFriends(friendsData));
         }
@@ -45,19 +32,6 @@ const Friends = () => {
     };
   
     fetchFriends();
-
-    /*
-    // Listen for 'updatePublicKey' event from the server
-    const updatePublicKeyHandler = ({ userId, publicKey }) => {
-      const cur_friend_id = userId
-      console.log("I have to update the public key of my friend with id, ", userId, ", with new public key: ", publicKey);
-      setFriendIdBeingUpdayed(cur_friend_id);
-      setNewFriendPublicKey(publicKey);
-    };
-
-    socket.on('updatePublicKey', updatePublicKeyHandler);
-    console.log("Mounted socket event listener for updatePublicKey");
-    */
   }, [user.id]);
 
   const friendships = useSelector(selectFriends); // Makes it so that if friends slice changes then this componenet authomatically re-renders
@@ -70,7 +44,7 @@ const Friends = () => {
         <ul className='friends-list'>
           {Object.entries(friendships).map(([friendshipId, friendId]) => (
             <li key={friendshipId}>
-              <Friend friendId={friendId} friendshipId={friendshipId} friendPublicKey={newFriendPublicKey} />
+              <Friend friendId={friendId} friendshipId={friendshipId} />
             </li>
           ))}
         </ul>

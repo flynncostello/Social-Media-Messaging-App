@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
 import axios from 'axios';
 import userAPI from '../../api/user';
-import { Buffer } from 'buffer';
 
+// Socket originates in this file and is also used in Chatroom.js for sending real-time messages
 import io from 'socket.io-client';
 export const socket = io('https://localhost:3000');
 
-
+/*
+All that is done in login is getting users data from database as well as current socket id and
+adding that info to the slice
+*/
 
 const Login = () => {
     const [loginUsername, setLoginUsername] = useState('');

@@ -10,12 +10,14 @@ const session = require('express-session');
 const supabase = require('./services/supabaseDatabaseService');
 const initializePassport = require('./passport_config');
 const crypto = require('crypto');
+const { Server } = require('socket.io');
+
 const usersRouter = require("./routes/usersRouter");
 const friendsRouter = require("./routes/friendsRouter");
 const friend_requestsRouter = require("./routes/friend_requestsRouter");
 const chatroomsRouter = require("./routes/chatroomsRouter");
 const messagesRouter = require("./routes/messagesRouter");
-const { Server } = require('socket.io');
+const chatroomSharedSecretRouter = require("./routes/chatroomSharedSecretRouter");
 
 //--------------------------------//
 // SETTING UP APP, IO, and SERVER //
@@ -92,6 +94,7 @@ app.use("/api/friends", friendsRouter);
 app.use("/api/friend_requests", friend_requestsRouter);
 app.use("/api/chatrooms", chatroomsRouter);
 app.use("/api/messages", messagesRouter);
+app.use("/api/chatroom_shared_secret", chatroomSharedSecretRouter);
 
 
 
@@ -122,11 +125,12 @@ app.post('/api/signup', async (req, res) => {
   // Password will already be hashed by now
   const { username, hashedPassword, is_active, public_key } = req.body;
   const userExists = await supabase.from("users").select("*").eq("username", username);
-  console.log("HASH PASSWORD FOR SIGN UP, ", hashedPassword)
+
   if (userExists.data.length > 0) {
     console.log("Username already exists")
     return res.json({ error: 'Username already exists' });
   }
+
   console.log("Username is valid")
 
   try {
@@ -198,67 +202,14 @@ io.on('connection', (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
-  // Logger for socket events
-  app.use((req, res, next) => {
-    const originalEmit = res.io.emit;
-    res.io.emit = function() {
-      console.log('Event emitted:', arguments);
-      return originalEmit.apply(this, arguments);
-    };
-    next();
-  });  
-
-  /*
-  // Update public key
-  socket.on('changePublicKey', async ({ userId, publicKey }) => {
-    const friends = await getAllFriends(userId);
-    console.log("Changing public key and telling all my friends, ", friends);
-    console.log("New Public key is: ", publicKey);
-    friends.forEach(friend => {
-      const friendSocketId = friend.socket_id;
-      if (friendSocketId) {
-        console.log("Sending updated public key to friend with socket_id: ", friendSocketId);
-        io.to(friendSocketId).emit('updatePublicKey', { publicKey, userId });
-      } else {
-        console.log("Friend socket_id not available for friend with id: ", friend.id);
-      }
-    });
-  });
-
-  // Restricting chats
-  socket.on('closeChats', async ({ userId }) => {
-    try {
-      console.log("CLOSING ALL CHATS")
-      // Get all the friends of the user who logged out
-      const friends = await getAllFriends(userId);
-      console.log("CLOSING, friends which need to close chats include: ", friends)
-
-      // Iterate through the friends and emit the 'closeChatroom' event to each of them
-      friends.forEach(friend => {
-        const friendSocketId = friend.socket_id;
-        if (friendSocketId) {
-          console.log(`Sending 'closeChatroom' event to friend with socket_id: ${friendSocketId}`);
-          io.to(friendSocketId).emit('closeChatroom', { userId });
-        } else {
-          console.log(`Friend socket_id not available for friend with id: ${friend.id}`);
-        }
-      });
-    } catch (error) {
-      console.error('Error handling closeChats event:', error);
-    }
-  });
-  */
-
   // Send a new message
   socket.on('send-message', async (data) => {
     const { roomId, encrypted_message, senderId, chatroom_index } = data;
     const socketsInRoom = await io.in(roomId).fetchSockets();
     const num_users_in_room = socketsInRoom.length;
     console.log(`IN SERVER: Room ${roomId} has ${num_users_in_room} users`);
-    //console.log("IN SERVER: Encrypted message: ", encrypted_message);
 
     if (num_users_in_room === 2) { // Both users in room
-      //console.log(`Sending the following information, encrypted message: ${encrypted_message}, senderId: ${senderId}, chatroom_index: ${chatroom_index} to room with id: ${roomId}`);
       console.log("IN SERVER: Message being sent with chatroom_index: ", chatroom_index)
       socket.to(roomId).emit('receive-message', { encrypted_message, senderId, chatroom_index });
       console.log("IN SERVER: Message broadcast over socket in room with id: ", roomId);

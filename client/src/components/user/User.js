@@ -28,8 +28,6 @@ Process:
 - When logging out it changes the user's is_active status to false in the database, clears the user slice, and redirects to the home page
 */
 
-import { socket } from '../login/Login';
-
 const User = () => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -44,7 +42,7 @@ const User = () => {
     const handleLogout = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('http://localhost:3000/api/logout');
+            const response = await axios.get('https://localhost:3000/api/logout');
             if (response.data.success) {
                 alert('Logged out successfully!');
                 userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
@@ -54,8 +52,6 @@ const User = () => {
                 dispatch(clearRequests()); // Clear friend requests slice
                 dispatch(resetChatroom()); // Clear chatroom slice
                 navigate('/'); // Redirect to home page
-
-                socket.emit('closeChats', { userId: user.id }); // Restrict chats for user
             } else {
                 alert('Logout failed:', response.data.message);
             }

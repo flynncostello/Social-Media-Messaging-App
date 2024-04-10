@@ -17,8 +17,6 @@ Process:
 - When user logs out it simply changes is_active state in database and clears all slices
 */
 
-import { socket } from '../login/Login';
-
 const UserAccount = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,8 +34,6 @@ const UserAccount = () => {
           dispatch(clearRequests()); // Clear friend requests slice
           dispatch(resetChatroom()); // Clear chatroom slice
           navigate('/');
-
-          socket.emit('closeChats', { userId: user.id }); // Restrict chats for user
         })
         .catch((error) => {
           console.error('Error deleting account:', error);
@@ -49,7 +45,7 @@ const UserAccount = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.get('http://localhost:3000/api/logout');
+        const response = await axios.get('https://localhost:3000/api/logout');
         if (response.data.success) {
             alert('Logged out successfully!');
             userAPI.updateUser(user.id, { is_active: false })

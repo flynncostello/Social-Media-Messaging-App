@@ -33,9 +33,6 @@ const Signup = () => {
             // Derive password encryption key using password
             const derived_password_key = await derivePasswordEncryptionKey(signupPassword);
 
-
-
-
             
             // Generating key pair
             const keyPair = await window.crypto.subtle.generateKey(
@@ -69,10 +66,6 @@ const Signup = () => {
             const publicKeyString = btoa(String.fromCharCode.apply(null, new Uint8Array(exported_public_key)));
 
 
-            
-
-
-
             // Hashing password
             const saltRounds = 10;
             const hashedPassword = bcrypt.hashSync(signupPassword, saltRounds); // Hashing password using 10 salt rounds
@@ -88,29 +81,24 @@ const Signup = () => {
 
             // Checking if sign up was successful
             if (response.status === 201) {
-                console.log('User signed up successfully, username:', signupUsername)
+                console.log('User signed up successfully, username: ', signupUsername)
+
+                // Getting user id
+                const new_user_id = response.data.id;
+
+                // Adding password encryption key to local storage along with user's id for identification
+                localStorage.setItem(`${new_user_id}_message_encryption_key`, derived_password_key);
+
+                // Store private key in localStorage
+                localStorage.setItem(`${new_user_id}_private_key`, privateKeyString);
+
                 navigate(ROUTES.login()); // Redirect to login page
+
             } else {
                 // Unexpected error
                 console.error('SIGN UP ERROR:', response.data.error);
                 alert(response.data.error);
             }
-
-            
-
-
-
-
-
-            // Getting user id
-            const new_user_id = response.id;
-
-            // Adding password encryption key to local storage along with user's id for identification
-            localStorage.setItem(`${new_user_id}_user_password_encryption_key`, derived_password_key);
-
-            // Store private key in localStorage
-            localStorage.setItem(`${new_user_id}_private_key`, privateKeyString);
-
         
 
         } catch (error) {
