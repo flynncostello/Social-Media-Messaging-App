@@ -10,7 +10,6 @@ const session = require('express-session');
 const supabase = require('./services/supabaseDatabaseService');
 const initializePassport = require('./passport_config');
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
 const usersRouter = require("./routes/usersRouter");
 const friendsRouter = require("./routes/friendsRouter");
 const friend_requestsRouter = require("./routes/friend_requestsRouter");
@@ -18,45 +17,56 @@ const chatroomsRouter = require("./routes/chatroomsRouter");
 const messagesRouter = require("./routes/messagesRouter");
 const { Server } = require('socket.io');
 
-/* SETTING UP SERVER */
+//--------------------------------//
+// SETTING UP APP, IO, and SERVER //
+//--------------------------------//
 initializePassport(passport);
-const app = express();
+const app = express(); // Used for middleware and routing
 
 // Load the SSL/TLS certificate files
-const privateKeyPath = path.join(__dirname, 'chatApp.key');
-const certificatePath = path.join(__dirname, 'chatApp.crt');
+const keyFilePath = path.join(__dirname, 'certs/key.pem');
+const certFilePath = path.join(__dirname, 'certs/cert.pem');
 
+// Set up credential object
 const credentials = {
-  key: fs.readFileSync(privateKeyPath, 'utf8'),
-  cert: fs.readFileSync(certificatePath, 'utf8')
+  key: fs.readFileSync(keyFilePath, 'utf8'),
+  cert: fs.readFileSync(certFilePath, 'utf8'),
 };
 
+// Create server
 const server = https.createServer(credentials, app);
+
+// Set up socket.io server to receive from ports 3000 -> 3010 for development
 const io = new Server(server, {
   cors: {
-    origin: ['https://localhost:3001', 'https://localhost:3002'],
+    origin: function (origin, callback) {
+      // Allow connections from any localhost with ports ranging from 3000 to 3010
+      if (!origin || /^https:\/\/localhost:(30[0-9][0-9]|31[0-0][0-9]|3010)$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
-    credentials: true,
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   },
 });
 
-
+// Generate a secret key for the app session
 const secretKey = crypto.randomBytes(64).toString('hex'); // Secret key for app session
 
-// Setting up cors and session for app
+// Middleware for app
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin 
-      // (like mobile apps or curl requests)
-      if(!origin) return callback(null, true);
-      if(['https://localhost:3001', 'https://localhost:3002'].indexOf(origin) !== -1){
-         callback(null, true)
+      // Allow requests from any localhost with ports ranging from 3000 to 3010
+      if (!origin || /^https:\/\/localhost:(30[0-9][0-9]|31[0-0][0-9]|3010)$/.test(origin)) {
+        callback(null, true);
       } else {
-         callback(new Error('Not allowed by CORS'))
+        callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true,
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   }),
   session({
     secret: secretKey,
@@ -74,7 +84,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-/* API ROUTES */
+//-------------------//
+// SETTING UP ROUTES //
+//-------------------//
 app.use("/api/users", usersRouter);
 app.use("/api/friends", friendsRouter);
 app.use("/api/friend_requests", friend_requestsRouter);
@@ -82,8 +94,10 @@ app.use("/api/chatrooms", chatroomsRouter);
 app.use("/api/messages", messagesRouter);
 
 
-/* USER AUTHENTICATION */
 
+//--------------------------------//
+// SETTING UP USER AUTHENTICATION //
+//--------------------------------//
 // Login route
 app.post('/api/login', (req, res, next) => {
     passport.authenticate('local', (err, user, { message }) => {
@@ -106,7 +120,7 @@ app.post('/api/login', (req, res, next) => {
 // Signup route
 app.post('/api/signup', async (req, res) => {
   // Password will already be hashed by now
-  const { username, hashedPassword, is_active } = req.body;
+  const { username, hashedPassword, is_active, public_key } = req.body;
   const userExists = await supabase.from("users").select("*").eq("username", username);
   console.log("HASH PASSWORD FOR SIGN UP, ", hashedPassword)
   if (userExists.data.length > 0) {
@@ -116,9 +130,10 @@ app.post('/api/signup', async (req, res) => {
   console.log("Username is valid")
 
   try {
-    const response = await supabase.from("users").insert([{ username, password: hashedPassword, is_active}]);
-    console.log("User successfully created and added to database");
-    return res.status(201).json({ success: true, message: 'User created successfully' });
+    const { data } = await supabase.from("users").insert([{ username, password: hashedPassword, is_active, public_key }]).select();
+    const new_user = data[0];
+    console.log("User successfully created and added to database. User data: ", new_user);
+    return res.status(201).json({ success: true, message: 'User created successfully', id: new_user.id });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -164,7 +179,11 @@ const getAllFriends = async (userId) => {
   }
 };
 
-/* SOCKET.IO */
+
+
+//------------------------------//
+// SETTING UP SOCKET.IO ROUTES //
+//----------------------------//
 io.on('connection', (socket) => {
   console.log('A user connected');
 
@@ -268,11 +287,13 @@ io.on('connection', (socket) => {
 });
 
 
-/* RUNNING SERVER */
+//-----------------//
+// RUNNING SERVER //
+//---------------//
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
-  console.log(`App listening on port ${port}!`);
+  console.log(`Server listening on port ${port}!`);
 });
 
 module.exports = app;

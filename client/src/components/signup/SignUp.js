@@ -5,12 +5,21 @@ import axios from 'axios';
 import ROUTES from '../../routes';
 
 import bcrypt from 'bcryptjs'; // Used for secure hashing
+import { derivePasswordEncryptionKey } from './signUpUtils';
 
 /*
 Process:
 - User enters username and password
-- User details are sent to server and stored in database
-- userSlice not impacted
+- Derive password encrpyption key using password
+- Hash users password with 10 salt rounds
+- Send users username, hashed password, is_active, and public key to server
+- Create user's public and private key
+- Store password key and private key in local storage (names start with user's id), e.g., 2dfg83dsfg9tg5us65b0g6ef_private_key
+
+Encryption things:
+1) public key
+2) private key
+3) derived password key (used for symmetric encryption of messages)
 */
 
 const Signup = () => {
@@ -21,15 +30,63 @@ const Signup = () => {
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
+            // Derive password encryption key using password
+            const derived_password_key = await derivePasswordEncryptionKey(signupPassword);
+
+
+
+
+            
+            // Generating key pair
+            const keyPair = await window.crypto.subtle.generateKey(
+                {
+                    name: 'RSA-OAEP',
+                    modulusLength: 4096,
+                    publicExponent: new Uint8Array([1, 0, 1]),
+                    hash: 'SHA-256',
+                },
+                true,
+                ['encrypt', 'decrypt']
+            );
+
+            // Export private key
+            const exported_private_key = await window.crypto.subtle.exportKey(
+                'pkcs8',
+                keyPair.privateKey
+            );
+
+            // Convert private key to string
+            const privateKeyString = btoa(String.fromCharCode.apply(null, new Uint8Array(exported_private_key)));
+
+
+            // Export public key
+            const exported_public_key = await window.crypto.subtle.exportKey(
+                'spki',
+                keyPair.publicKey
+            );
+
+            // Convert public key to string
+            const publicKeyString = btoa(String.fromCharCode.apply(null, new Uint8Array(exported_public_key)));
+
+
+            
+
+
+
+            // Hashing password
             const saltRounds = 10;
             const hashedPassword = bcrypt.hashSync(signupPassword, saltRounds); // Hashing password using 10 salt rounds
 
-            const response = await axios.post('http://localhost:3000/api/signup', {
+
+            // Sending username, hashed password, is_active, and public key to server
+            const response = await axios.post('https://localhost:3000/api/signup', {
                 username: signupUsername,
                 hashedPassword: hashedPassword,
                 is_active: false,
+                public_key: publicKeyString,
             });
-        
+
+            // Checking if sign up was successful
             if (response.status === 201) {
                 console.log('User signed up successfully, username:', signupUsername)
                 navigate(ROUTES.login()); // Redirect to login page
@@ -38,6 +95,23 @@ const Signup = () => {
                 console.error('SIGN UP ERROR:', response.data.error);
                 alert(response.data.error);
             }
+
+            
+
+
+
+
+
+            // Getting user id
+            const new_user_id = response.id;
+
+            // Adding password encryption key to local storage along with user's id for identification
+            localStorage.setItem(`${new_user_id}_user_password_encryption_key`, derived_password_key);
+
+            // Store private key in localStorage
+            localStorage.setItem(`${new_user_id}_private_key`, privateKeyString);
+
+        
 
         } catch (error) {
             // Other errors
