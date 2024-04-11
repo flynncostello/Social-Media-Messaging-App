@@ -75,9 +75,9 @@ const messagesModel = {
     },
 
     m_createMessage: async (message_info) => {
-        const { chatroom_id, chatroom_index, stored_by_id, sender_id, content, waiting_for_retrieval = false } = message_info;
+        const { chatroom_id, chatroom_index, stored_by_id, sender_id, content, waiting_for_retrieval = false, hmac = '' } = message_info;
         try {
-            const messageToInsert = { chatroom_id, chatroom_index, sender_id, content, waiting_for_retrieval };
+            const messageToInsert = { chatroom_id, chatroom_index, sender_id, content, waiting_for_retrieval, hmac };
             if (stored_by_id) {
                 messageToInsert.stored_by_id = stored_by_id;
             }

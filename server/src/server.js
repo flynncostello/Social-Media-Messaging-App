@@ -121,17 +121,23 @@ app.post('/api/login', (req, res, next) => {
 });
 
 // Signup route
+app.get('/api/checkusername', async (req, res) => {
+  const { username } = req.query;
+  const { data: userExists, error } = await supabase.from("users").select("*").eq("username", username);
+  if (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+  if (userExists.length > 0) {
+    console.log("Username already exists")
+    return res.json({ usernameExists: true });
+  }
+  return res.json({ usernameExists: false });
+});
+
 app.post('/api/signup', async (req, res) => {
   // Password will already be hashed by now
   const { username, hashedPassword, is_active, public_key } = req.body;
-  const userExists = await supabase.from("users").select("*").eq("username", username);
-
-  if (userExists.data.length > 0) {
-    console.log("Username already exists")
-    return res.json({ error: 'Username already exists' });
-  }
-
-  console.log("Username is valid")
 
   try {
     const { data } = await supabase.from("users").insert([{ username, password: hashedPassword, is_active, public_key }]).select();
@@ -204,21 +210,21 @@ io.on('connection', (socket) => {
 
   // Send a new message
   socket.on('send-message', async (data) => {
-    const { roomId, encrypted_message, senderId, chatroom_index } = data;
+    const { roomId, encrypted_message, hmac, senderId, chatroom_index } = data;
     const socketsInRoom = await io.in(roomId).fetchSockets();
     const num_users_in_room = socketsInRoom.length;
     console.log(`IN SERVER: Room ${roomId} has ${num_users_in_room} users`);
 
     if (num_users_in_room === 2) { // Both users in room
       console.log("IN SERVER: Message being sent with chatroom_index: ", chatroom_index)
-      socket.to(roomId).emit('receive-message', { encrypted_message, senderId, chatroom_index });
+      socket.to(roomId).emit('receive-message', { encrypted_message, hmac, senderId, chatroom_index });
       console.log("IN SERVER: Message broadcast over socket in room with id: ", roomId);
     } else {
       console.log("IN SERVER: Other user is not in room to receive message so sending to database");
       // Store encrypted message in database
       try {
         // Send with waiting_for_retrieval porperty as true, once friend receives this message delete it as it isn't encrypted with the friend's password
-        await m_createMessage({ chatroom_id: roomId, chatroom_index, sender_id: senderId, content: encrypted_message, waiting_for_retrieval: true}); // stored_by_id = -1, means no one is storing this until it is successfully retrieved next time friend opens chatroom
+        await m_createMessage({ chatroom_id: roomId, chatroom_index, sender_id: senderId, content: encrypted_message, waiting_for_retrieval: true, hmac}); // stored_by_id = -1, means no one is storing this until it is successfully retrieved next time friend opens chatroom
         console.log("IN SERVER: Encrypted message saved to database with waiting_for_retrieval as true");
       } catch (error) {
         console.error("Error saving message to database:", error);

@@ -7,7 +7,7 @@ import { selectUser } from "../../../slices/userSlice";
 import { selectChatroom, addMessage, resetChatroom } from '../../../slices/chatroomSlice';
 
 import messagesAPI from '../../../api/messages';
-import { encryptMessageWithSharedKey, decryptMessageWithSharedKey, encryptMessageWithUsersPassword } from './chatroom_utils';
+import { encryptMessageWithSharedKey, decryptMessageWithSharedKey, encryptMessageWithUsersPassword, generateHMAC, validateHmac } from './chatroom_utils';
 import './Chatroom.css';
 
 import { socket } from '../../login/Login';
@@ -53,8 +53,16 @@ const Chatroom = () => {
       // Listen for incoming messages
       socket.on('receive-message', (data) => {
         const handleReceivedMessage = async () => {
-          const { encrypted_message, senderId, chatroom_index } = data; // Message is string text i.e., content
+          const { encrypted_message, hmac, senderId, chatroom_index } = data; // Message is string text i.e., content
           console.log("Received encrypted message over socket from friend: ", encrypted_message)
+          
+          // First check HMAC is valid and thus message hasn't been tampereed with //
+          const is_hmac_valid = validateHmac(encrypted_message, hmac, chatroom_id);
+          if (!is_hmac_valid) {
+            console.error("HMAC is not valid, message has been tampered with");
+            return;
+          }
+          
           // Decrypting message using shared secret
           const decryptedMessage = await decryptMessageWithSharedKey(chatroom_id, encrypted_message);
           console.log("Decrypted message on receivers end: ", decryptedMessage)
@@ -111,7 +119,9 @@ const Chatroom = () => {
     console.log("Message being sent: ", message);
     const message_encrypted_with_shared_key = await encryptMessageWithSharedKey(chatroom_id, message);
     console.log("Message encrypted with shared key: ", message_encrypted_with_shared_key)
-    socket.emit('send-message', { roomId: chatroom_id, encrypted_message: message_encrypted_with_shared_key, senderId: user_id, chatroom_index: message_index });
+    const hmac = generateHMAC(message_encrypted_with_shared_key, chatroom_id);
+    console.log("HMAC for message: ", hmac);
+    socket.emit('send-message', { roomId: chatroom_id, encrypted_message: message_encrypted_with_shared_key, hmac: hmac, senderId: user_id, chatroom_index: message_index });
     console.log("Sent message over socket to friend");
 
     // STORING MESSAGE ENCRYPTED WITH USER'S PASSWORD IN DATABASE //

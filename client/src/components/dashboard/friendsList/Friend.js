@@ -10,7 +10,7 @@ import { removeFriend } from '../../../slices/friendsSlice';
 import { selectUser } from '../../../slices/userSlice';
 import { setChatroom } from '../../../slices/chatroomSlice';
 import messagesAPI from '../../../api/messages';
-import { encryptWithReceiversPublicKey, decryptMessageWithSharedKey, decryptWithPrivateKey, encryptMessageWithUsersPassword, decryptMessageWithUsersPassword } from '../chatroom/chatroom_utils';
+import { encryptWithReceiversPublicKey, decryptMessageWithSharedKey, decryptWithPrivateKey, encryptMessageWithUsersPassword, decryptMessageWithUsersPassword, validateHmac } from '../chatroom/chatroom_utils';
 import chatroomSharedSecretAPI from '../../../api/chatroomSharedSecret';
 
 const Friend = ({ friendId, friendshipId }) => {
@@ -86,6 +86,14 @@ const Friend = ({ friendId, friendshipId }) => {
       
       } else if (message.waiting_for_retrieval === true && message.sender_id === friendId) { // Message needs to be retrieved by user and decrypted using users private key
         console.log("IN FRIEND.JS: Retrieving a message which has been waiting for retrieval\n")
+        // First check hmac is valid before decrypting message
+        const hmac_is_valid = validateHmac(message.content, message.hmac, chatroom_id);
+        if (!hmac_is_valid) {
+          console.error("HMAC is not valid, message has been tampered with");
+          return;
+        }
+
+        // Now decrypt message with shared secret key
         const decryptedMessage = await decryptMessageWithSharedKey(chatroom_id, message.content)
         console.log("IN FRIEND.JS: Message which is waiting for retrieval, decrypted using friend's public key: ", decryptedMessage)
         const decryptedMessageObject = {
@@ -133,6 +141,22 @@ const Friend = ({ friendId, friendshipId }) => {
 
         if (cur_chatroom_friendId === friend_id) {
           // Found chatroom we are entering
+
+          ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          //* CHECKING IF ALREADY HAS SHARED SECRET, IF NOT RETRIEVE FROM DATABASE, STORE IN LOCAL STORAGE, THEN DELETE ENTRY IN DATABASE *//
+          ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          if (localStorage.getItem(`${cur_chatroom_id}_shared_secret`) === null) {
+            // The key does not exist in localStorage
+            const shared_secret_data = await chatroomSharedSecretAPI.getChatroomSharedSecret(cur_chatroom_id);
+            console.log("GOT SHARED SECRET FOR THIS CHATROOM AS I HAVEN'T BEEN IN HERE YET");
+            // Decrypting shared secret with user's private key
+            const decrypted_shared_secret = await decryptWithPrivateKey(shared_secret_data.encrypted_shared_secret, user_id);
+            // Store shared secret in local storage
+            localStorage.setItem(`${cur_chatroom_id}_shared_secret`, decrypted_shared_secret);
+            // Finally delete shared secret from database
+            await chatroomSharedSecretAPI.deleteChatroomSharedSecret(cur_chatroom_id);
+          }
+
           console.log("Chatroom we are entering is: ", cur_chatroom_id);
           const messages = await getMessagesFromChatroom(cur_chatroom_id);
           console.log("Chatroom messages: ", messages, " for chatroom id: ", cur_chatroom_id);
@@ -195,20 +219,6 @@ const Friend = ({ friendId, friendshipId }) => {
 
 
     } else {
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //* CHECKING IF ALREADY HAS SHARED SECRET, IF NOT RETRIEVE FROM DATABASE, STORE IN LOCAL STORAGE, THEN DELETE ENTRY IN DATABASE *//
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      if (localStorage.getItem(`${existingChatroomInfo.chatroomId}_shared_secret`) === null) {
-        // The key does not exist in localStorage
-        const shared_secret_data = await chatroomSharedSecretAPI.getChatroomSharedSecret(existingChatroomInfo.chatroomId);
-        // Decrypting shared secret with user's private key
-        const decrypted_shared_secret = await decryptWithPrivateKey(shared_secret_data.encrypted_shared_secret, user_id);
-        // Store shared secret in local storage
-        localStorage.setItem(`${existingChatroomInfo.chatroomId}_shared_secret`, decrypted_shared_secret);
-        // Finally delete shared secret from database
-        await chatroomSharedSecretAPI.deleteChatroomSharedSecret(existingChatroomInfo.chatroomId);
-      }
-
       // Chatroom exists in database
       console.log("Using an existing chatroom")
       dispatch(

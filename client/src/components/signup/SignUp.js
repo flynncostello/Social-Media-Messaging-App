@@ -30,6 +30,15 @@ const Signup = () => {
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
+            // Check username is valid first
+            const username_check_response = await axios.get('https://localhost:3000/api/checkusername', { params: { username: signupUsername } });
+            console.log('validUsername:', username_check_response)
+            if (username_check_response.data.usernameExists) {
+                console.error('SIGN UP ERROR: Username already exists');
+                alert('Username already exists');
+                return;
+            }
+
             // Derive password encryption key using password
             const derived_password_key = await derivePasswordEncryptionKey(signupPassword);
 

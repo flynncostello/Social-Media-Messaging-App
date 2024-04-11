@@ -183,8 +183,15 @@ export const decryptMessageWithUsersPassword = async (encryptedMessage, user_id)
 };
 
 // Function for generating HMAC
-const generateHMAC = (message, secretKey) => {
-    const hmac = CryptoJS.HmacSHA256(message, secretKey);
+export const generateHMAC = (encrypted_message, chatroom_id) => {
+    const sharedSecret = localStorage.getItem(`${chatroom_id}_shared_secret`);
+    const hmac = CryptoJS.HmacSHA256(encrypted_message, sharedSecret);
     return hmac.toString(CryptoJS.enc.Base64);
 };
 
+// Function to check HMAC is correct
+export const validateHmac = (encrypted_message, hmac, chatroom_id) => {
+    const sharedSecret = localStorage.getItem(`${chatroom_id}_shared_secret`);
+    const expectedHmac = generateHMAC(encrypted_message, chatroom_id);
+    return hmac === expectedHmac;
+};
