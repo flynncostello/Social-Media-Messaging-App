@@ -49,8 +49,11 @@ const Friend = ({ friendId, friendshipId }) => {
       const friendship = friends_friends.find(
         (friendship) => friendship.user_id === friendId && friendship.friend_id === user_id
       );
-      const second_friendship_id = friendship.id;
-      friendsAPI.deleteFriendship(second_friendship_id);
+      // We are first one to delete friend
+      if (friendship) {
+        const second_friendship_id = friendship.id;
+        friendsAPI.deleteFriendship(second_friendship_id);
+      }
     }
   };
 
