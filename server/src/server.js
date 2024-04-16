@@ -85,16 +85,24 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Middleware function to check if user is authenticated
+const isAuthenticated = (req, res, next) => {
+  console.log("User is authenticated: ", req.isAuthenticated());
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: 'Unauthorized' });
+};
 
 //-------------------//
 // SETTING UP ROUTES //
 //-------------------//
-app.use("/api/users", usersRouter);
-app.use("/api/friends", friendsRouter);
-app.use("/api/friend_requests", friend_requestsRouter);
-app.use("/api/chatrooms", chatroomsRouter);
-app.use("/api/messages", messagesRouter);
-app.use("/api/chatroom_shared_secret", chatroomSharedSecretRouter);
+app.use("/api/users", isAuthenticated, usersRouter);
+app.use("/api/friends", isAuthenticated, friendsRouter);
+app.use("/api/friend_requests", isAuthenticated, friend_requestsRouter);
+app.use("/api/chatrooms", isAuthenticated, chatroomsRouter);
+app.use("/api/messages", isAuthenticated, messagesRouter);
+app.use("/api/chatroom_shared_secret", isAuthenticated, chatroomSharedSecretRouter);
 
 
 
@@ -115,6 +123,7 @@ app.post('/api/login', (req, res, next) => {
             return next(err);
           }
           // Return the user's ID in the response
+          console.log("User logged in and session setup correctly");
           return res.json({ success: true, message, user });
         });
     })(req, res, next);

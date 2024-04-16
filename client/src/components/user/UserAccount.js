@@ -10,6 +10,8 @@ import { clearFriendsSlice } from '../../slices/friendsSlice';
 import { clearRequests } from '../../slices/friendRequestsSlice';
 import { resetChatroom } from '../../slices/chatroomSlice';
 
+import { API_ENDPOINT } from '../../api/index'
+
 /*
 Process:
 - Starts by just showing id, username, and is_active state
@@ -22,33 +24,38 @@ const UserAccount = () => {
   const navigate = useNavigate();
   const user = useSelector(selectUser);
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account?");
     if (confirmDelete) {
-      //console.log('Deleting account of user with ID:', user.id);
-      userAPI.deleteUser(user.id)
-        .then(() => {
+      try {
+        await userAPI.deleteUser(user.id);
+
+        const response = await axios.get(`${API_ENDPOINT}/logout`);
+  
+        if (response.data.success) {
           alert('Account deleted successfully!');
-          dispatch(clearUserSlice()); // Clear user slice
-          dispatch(clearFriendsSlice()); // Clear friends slice
-          dispatch(clearRequests()); // Clear friend requests slice
-          dispatch(resetChatroom()); // Clear chatroom slice
+          dispatch(clearUserSlice());
+          dispatch(clearFriendsSlice());
+          dispatch(clearRequests());
+          dispatch(resetChatroom());
           navigate('/');
-        })
-        .catch((error) => {
-          console.error('Error deleting account:', error);
-          alert('Failed to delete account. Please try again later.');
-        });
+        } else {
+          alert('Failed to logout after deleting account.');
+        }
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        alert('Failed to delete account. Please try again later.');
+      }
     }
   };
 
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-        const response = await axios.get('https://localhost:3000/api/logout');
+      userAPI.updateUser(user.id, { is_active: false })
+      const response = await axios.get(`${API_ENDPOINT}/logout`);
         if (response.data.success) {
             alert('Logged out successfully!');
-            userAPI.updateUser(user.id, { is_active: false })
             dispatch(clearUserSlice()); // Clear user slice
             dispatch(clearFriendsSlice()); // Clear friends slice
             navigate('/');

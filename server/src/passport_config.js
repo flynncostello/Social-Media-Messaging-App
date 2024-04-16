@@ -33,13 +33,23 @@ function initializePassport(passport) {
         done(null, user.id);
     });
 
-    // Subsequent requests run deserializeUser instead of the full authenticate strategy
     passport.deserializeUser((id, done) => {
-        supabase.from("users").select("*").eq("id", id).then((result) => {
-            done(null, result.data[0]);
-        }).catch((error) => {
-            done(error);
-        });
+        if (!id) {
+            done(null, false);
+            return;
+        } else {
+            supabase.from("users").select("*").eq("id", id).then((result) => {
+                if (result.data.length > 0) {
+                    // User exists, continue as normal
+                    done(null, result.data[0]);
+                } else {
+                    // User doesn't exist, log them out
+                    done(null, false);
+                }
+            }).catch((error) => {
+                done(error);
+            });
+        }
     });
 
 };

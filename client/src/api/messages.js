@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './index';
 import { API_ENDPOINT } from './index';
 
 const messagesAPI = {

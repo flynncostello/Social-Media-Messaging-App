@@ -20,6 +20,8 @@ import { useDispatch } from 'react-redux';
 import userAPI from '../../api/user';
 import ROUTES from '../../routes';
 
+import { API_ENDPOINT } from '../../api/index'
+
 import './User.css';
 
 /*
@@ -42,11 +44,12 @@ const User = () => {
     const handleLogout = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('https://localhost:3000/api/logout');
+            userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
+
+            const response = await axios.get(`${API_ENDPOINT}/logout`);
+            
             if (response.data.success) {
-                alert('Logged out successfully!');
-                userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
-                
+                alert('Logged out successfully!');                
                 dispatch(clearUserSlice()); // Clear user slice
                 dispatch(clearFriendsSlice()); // Clear friends slice
                 dispatch(clearRequests()); // Clear friend requests slice
