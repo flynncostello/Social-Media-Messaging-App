@@ -34,3 +34,4 @@ export const derivePasswordEncryptionKey = async (password, user_id) => {
     const encryptionKeyStr = Buffer.from(new Uint8Array(exportedEncryptionKey)).toString('hex');
     return encryptionKeyStr;
 };
+

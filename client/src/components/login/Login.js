@@ -6,6 +6,8 @@ import ROUTES from '../../routes';
 import axios from 'axios';
 import userAPI from '../../api/user';
 
+import { API_ENDPOINT } from '../../api/index';
+
 // Socket originates in this file and is also used in Chatroom.js for sending real-time messages
 import io from 'socket.io-client';
 export const socket = io('https://localhost:3000');
@@ -25,10 +27,11 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://localhost:3000/api/login', { username: loginUsername, password: loginPassword });
-            const data = response.data;
+            const { data } = await axios.post(`${API_ENDPOINT}/login`, { username: loginUsername, password: loginPassword });
 
             if (data.success) {
+                const sessionId = data.sessionId;
+                console.log("This users session id is: ", sessionId);
                 const user_data = data.user;
                 user_data.is_active = true;
 
@@ -68,11 +71,11 @@ const Login = () => {
             <form onSubmit={handleLogin}>
                 <label>
                     Username:
-                    <input type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
+                    <input required type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
                 </label>
                 <label>
                     Password:
-                    <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                    <input required type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
                 </label>
                 <input type="submit" value="Submit" />
             </form>
@@ -81,3 +84,5 @@ const Login = () => {
 };
 
 export default Login;
+
+

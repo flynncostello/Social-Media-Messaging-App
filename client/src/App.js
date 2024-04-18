@@ -3,13 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 
-/*
-Home.js
-Login.js
-SignUp.js
-Dashboard.js
-Chatrooms.js
-*/
 import Home from './components/home/Home';
 import Login from './components/login/Login';
 import SignUp from './components/signup/SignUp';
@@ -55,10 +48,3 @@ export default function App() {
     </Provider>
   );
 }
-
-/*
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/dashboard/:userId" element={<Dashboard />} />
-          <Route path="/chatrooms/:chatroomId/:userId" element={<Chatroom />} />
-*/

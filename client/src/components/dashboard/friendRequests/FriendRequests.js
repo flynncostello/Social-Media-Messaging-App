@@ -26,12 +26,10 @@ const FriendRequests = () => {
             if (userId) {
                 try {
                     const sentRequests = await friendRequestAPI.getFriendRequestsSent(userId);
-                    //console.log("SENT REQUESTS: ", sentRequests)
                     dispatch(clearSentRequests());
                     dispatch(setSentRequests(sentRequests));
 
                     const receivedRequests = await friendRequestAPI.getFriendRequestsReceived(userId);
-                    //console.log("RECEIVED REQUESTS: ", receivedRequests)
                     dispatch(clearReceivedRequests());
                     dispatch(setReceivedRequests(receivedRequests));
                 } catch (error) {
@@ -39,7 +37,6 @@ const FriendRequests = () => {
                 }
             }
         };
-
         fetchFriendRequests();
     }, [userId]);
 

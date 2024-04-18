@@ -51,7 +51,7 @@ const usersModel = {
 
     m_updateUser: async (user_id, updated_user_info) => {
         const { username, password, is_active, public_key, socket_id } = updated_user_info;
-        console.log('UPDATED USER INFO USER UPDATE: ', updated_user_info)
+        //console.log('UPDATED USER INFO USER UPDATE: ', updated_user_info)
       
         try {
           const { data, error } = await supabase

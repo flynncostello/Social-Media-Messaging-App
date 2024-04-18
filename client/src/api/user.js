@@ -48,9 +48,7 @@ const userAPI = {
 
   searchUsers: async (searchTerm, user_id, friends_ids) => {
     try {
-      const response = await axios.get(`${API_ENDPOINT}/users/search?username=${searchTerm}`);
-      //console.log("FRONTEND API, RESPONSE FROM SEARCH USERS: ", response.data);
-  
+      const response = await axios.get(`${API_ENDPOINT}/users/search?username=${searchTerm}`);  
       const filteredUsers = response.data.filter(user => 
         user.id !== user_id && !friends_ids.includes(user.id)
       );

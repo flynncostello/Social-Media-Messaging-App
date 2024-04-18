@@ -5,7 +5,6 @@ const friendsAPI = {
   getFriends: async (user_id) => {
     try {
       const response = await axios.get(`${API_ENDPOINT}/friends/${user_id}`);
-      //console.log('FRONTEND FRIENDS API, RESPONSE TO GET FRIENDS: ', response.data);
       return response.data;
     } catch (error) {
       return [];

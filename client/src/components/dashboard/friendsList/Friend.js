@@ -42,17 +42,21 @@ const Friend = ({ friendId, friendshipId }) => {
       console.log(friendshipId);
       // Deleting the first friendship connection (user_id is the user who is logged in)
       dispatch(removeFriend(friendshipId));
-      friendsAPI.deleteFriendship(friendshipId);
+      await friendsAPI.deleteFriendship(friendshipId);
+      console.log("Deleted friendship with id: ", friendshipId)
 
       // Deleting the second friendship connection (friend_id is the user who is logged in)
       const friends_friends = await friendsAPI.getFriends(friendId);
+      console.log("My friends friends are: ", friends_friends)
       const friendship = friends_friends.find(
         (friendship) => friendship.user_id === friendId && friendship.friend_id === user_id
       );
+      console.log("Other friendship to delete: ", friendship)
       // We are first one to delete friend
       if (friendship) {
         const second_friendship_id = friendship.id;
-        friendsAPI.deleteFriendship(second_friendship_id);
+        await friendsAPI.deleteFriendship(second_friendship_id);
+        console.log("Deleted friendship with id: ", second_friendship_id)
       }
     }
   };
@@ -227,7 +231,7 @@ const Friend = ({ friendId, friendshipId }) => {
       dispatch(
         setChatroom({
           id: existingChatroomInfo.chatroomId,
-          friend: friendDetails,
+          friend: friendDetails, 
           messages: existingChatroomInfo.messages,
         })
       );

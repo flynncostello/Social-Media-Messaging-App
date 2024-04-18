@@ -3,7 +3,7 @@ const usersModel = require('../models/usersModel');
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await usersModel.m_getAllUsers();
-        console.log("USERS IN SERVER CONTROLLER, ", users)
+        //console.log("USERS IN SERVER CONTROLLER, ", users)
         res.json(users);
     } catch (error) {
         res.status(404).json({ error: 'Users not found' });
@@ -12,7 +12,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
     const user_id = req.params.userId;
-    console.log("USER ID: ", user_id)
+    //console.log("USER ID: ", user_id)
     try {
         const user = await usersModel.m_getUserById(user_id);
         res.json(user);
@@ -34,7 +34,7 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
     const user_id = req.params.userId;
     const updated_user_info = req.body;
-    console.log("IN CONTROLLER USER INFO: ", updated_user_info)
+    //console.log("IN CONTROLLER USER INFO: ", updated_user_info)
     try {
         const updated_user = await usersModel.m_updateUser(user_id, updated_user_info);
         res.status(200).json(updated_user);

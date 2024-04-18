@@ -1,6 +1,4 @@
 import React from 'react';
-
-// Importing components used on dashboard
 import User from '../user/User';
 import Friends from './friendsList/Friends';
 import NewFriend from './addNewFriend/NewFriend';
@@ -43,3 +41,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+

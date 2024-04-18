@@ -5,12 +5,13 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('morgan');
 const path = require('path');
-const passport = require('passport');
-const session = require('express-session');
+
 const supabase = require('./services/supabaseDatabaseService');
-const initializePassport = require('./passport_config');
 const crypto = require('crypto');
 const { Server } = require('socket.io');
+
+const session = require('express-session');
+
 
 const usersRouter = require("./routes/usersRouter");
 const friendsRouter = require("./routes/friendsRouter");
@@ -22,7 +23,10 @@ const chatroomSharedSecretRouter = require("./routes/chatroomSharedSecretRouter"
 //--------------------------------//
 // SETTING UP APP, IO, and SERVER //
 //--------------------------------//
+const passport = require('passport');
+const initializePassport = require('./passport_config');
 initializePassport(passport);
+
 const app = express(); // Used for middleware and routing
 
 // Load the SSL/TLS certificate files
@@ -56,6 +60,8 @@ const io = new Server(server, {
 
 // Generate a secret key for the app session
 const secretKey = crypto.randomBytes(64).toString('hex'); // Secret key for app session
+//console.log("My secret key: ", secretKey);
+
 
 // Middleware for app
 app.use(
@@ -72,16 +78,19 @@ app.use(
   }),
   session({
     secret: secretKey,
-    cookie: { maxAge: 3000000, secure: true, sameSite: 'none' },
+    cookie: { maxAge: 30000000, secure: true, sameSite: 'none' },
     resave: false,
     saveUninitialized: false,
   })
 );
 
+const cookieParser = require('cookie-parser');
+
 // Adding passport middleware
+app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(logger("dev"));
+//app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -94,6 +103,7 @@ const isAuthenticated = (req, res, next) => {
   res.status(401).json({ error: 'Unauthorized' });
 };
 
+
 //-------------------//
 // SETTING UP ROUTES //
 //-------------------//
@@ -104,29 +114,32 @@ app.use("/api/chatrooms", isAuthenticated, chatroomsRouter);
 app.use("/api/messages", isAuthenticated, messagesRouter);
 app.use("/api/chatroom_shared_secret", isAuthenticated, chatroomSharedSecretRouter);
 
-
+app.use((req, res, next) => {
+  console.log('Session ID:', req.sessionID);
+  next();
+});
 
 //--------------------------------//
 // SETTING UP USER AUTHENTICATION //
 //--------------------------------//
 // Login route
 app.post('/api/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, { message }) => {
-        if (err) {
-          return next(err);
-        }
-        if (!user) {
-          return res.json({ success: false, message });
-        }
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-          // Return the user's ID in the response
-          console.log("User logged in and session setup correctly");
-          return res.json({ success: true, message, user });
-        });
-    })(req, res, next);
+  passport.authenticate('local', (err, user, { message }) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.json({ success: false, message });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      // Return the user's ID and session ID in the response
+      console.log('Session info: ', req.session);
+      return res.json({ success: true, message, user, sessionId: req.session.id });
+    });
+  })(req, res, next);
 });
 
 // Signup route
@@ -161,6 +174,7 @@ app.post('/api/signup', async (req, res) => {
 
 // Logout route
 app.get('/api/logout', (req, res) => {
+  console.log("Users current session info: ", req.session);
   req.logout((err) => {
     if (err) {
       return res.json({ success: false, message: 'Error logging out' });
@@ -262,4 +276,7 @@ server.listen(port, () => {
   console.log(`Server listening on port ${port}!`);
 });
 
-module.exports = app;
+module.exports = {
+  app: app,
+  passport: passport
+};

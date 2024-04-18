@@ -6,7 +6,7 @@ const friend_requestsModel = {
             const { data } = await supabase.from("friend_requests").select("*").eq("sender_id", user_id);
             const friend_requests_sent = data.length > 0 ? data : null;
             if (friend_requests_sent) {
-                console.log(friend_requests_sent)
+                //console.log(friend_requests_sent)
                 return friend_requests_sent;
             } else {
                 return []; // No friend requests sent

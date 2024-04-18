@@ -15,7 +15,6 @@ const NewFriendSearchResults = ({ searchValue }) => {
         const getSearchResults = async () => {
             try {
                 const searchResults = await userAPI.searchUsers(searchValue, user_id, friends);
-                //console.log("INSIDE SEARCH RESULTS SEARCH RESULTS ARE: ", searchResults)
                 setResults(searchResults);
             } catch (error) {
                 console.error('Error fetching search results:', error);

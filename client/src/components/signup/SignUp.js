@@ -7,6 +7,8 @@ import ROUTES from '../../routes';
 import bcrypt from 'bcryptjs'; // Used for secure hashing
 import { derivePasswordEncryptionKey } from './signUpUtils';
 
+import { API_ENDPOINT } from '../../api/index'
+
 /*
 Process:
 - User enters username and password
@@ -31,7 +33,7 @@ const Signup = () => {
         e.preventDefault();
         try {
             // Check username is valid first
-            const username_check_response = await axios.get('https://localhost:3000/api/checkusername', { params: { username: signupUsername } });
+            const username_check_response = await axios.get(`${API_ENDPOINT}/checkusername`, { params: { username: signupUsername } });
             console.log('validUsername:', username_check_response)
             if (username_check_response.data.usernameExists) {
                 console.error('SIGN UP ERROR: Username already exists');
@@ -81,7 +83,7 @@ const Signup = () => {
 
 
             // Sending username, hashed password, is_active, and public key to server
-            const response = await axios.post('https://localhost:3000/api/signup', {
+            const response = await axios.post(`${API_ENDPOINT}/signup`, {
                 username: signupUsername,
                 hashedPassword: hashedPassword,
                 is_active: false,

@@ -1,15 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../slices/userSlice';
-
 import friendsAPI from '../../../api/friends';
 import Friend from './Friend';
-
 import { setFriends, clearFriendsSlice, selectFriends } from '../../../slices/friendsSlice';
 import { useDispatch } from 'react-redux';
-
 import './Friends.css';
-
 
 const Friends = () => {
   let fetchedFriendsData = false;
@@ -54,3 +50,4 @@ const Friends = () => {
 };
 
 export default Friends;
+

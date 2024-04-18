@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import friendRequestAPI from '../../../api/friend_request';
 import './FriendRequestSent.css';
 import userAPI from '../../../api/user';
 import { formatDate } from '../../../utils';
