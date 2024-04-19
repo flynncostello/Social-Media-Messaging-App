@@ -1,5 +1,6 @@
 .search-results-container {
     margin-top: 40px;
+    overflow-y: scroll;
 }
 
 .results-container {
@@ -8,4 +9,8 @@
     padding: 10px;
     margin-top: -20px;
     gap: 20px;
+}
+
+h3 {
+    font-weight: 400;
 }

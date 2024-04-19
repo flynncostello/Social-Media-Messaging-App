@@ -60,8 +60,6 @@ const io = new Server(server, {
 
 // Generate a secret key for the app session
 const secretKey = crypto.randomBytes(64).toString('hex'); // Secret key for app session
-//console.log("My secret key: ", secretKey);
-
 
 // Middleware for app
 app.use(
@@ -84,13 +82,11 @@ app.use(
   })
 );
 
-const cookieParser = require('cookie-parser');
 
 // Adding passport middleware
-app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
-//app.use(logger("dev"));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -114,10 +110,14 @@ app.use("/api/chatrooms", isAuthenticated, chatroomsRouter);
 app.use("/api/messages", isAuthenticated, messagesRouter);
 app.use("/api/chatroom_shared_secret", isAuthenticated, chatroomSharedSecretRouter);
 
-app.use((req, res, next) => {
-  console.log('Session ID:', req.sessionID);
-  next();
+
+app.get('/api/sessionInfo', (req, res) => {
+  console.log('$$$ Current session id is: ', req.session.id);
+  console.log('$$$ Current session info: ', req.session);
+  res.end();
 });
+
+
 
 //--------------------------------//
 // SETTING UP USER AUTHENTICATION //
@@ -131,12 +131,13 @@ app.post('/api/login', (req, res, next) => {
     if (!user) {
       return res.json({ success: false, message });
     }
+    console.log("Logging in with session Id: ", req.session.id);
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
       }
       // Return the user's ID and session ID in the response
-      console.log('Session info: ', req.session);
+      //console.log('Session info: ', req.session);
       return res.json({ success: true, message, user, sessionId: req.session.id });
     });
   })(req, res, next);

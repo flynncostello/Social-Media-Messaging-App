@@ -1,8 +1,8 @@
 const friendsModel = require('../models/friendsModel');
 
 exports.getUsersFriends = async (req, res) => {
-    console.log("Users id is: ", req.params.userId);
-    console.log("Users current session info: ", req.session);
+    //console.log("Users id is: ", req.params.userId);
+    //console.log("Users current session info: ", req.session);
 
     const user_id = req.params.userId;
     try {

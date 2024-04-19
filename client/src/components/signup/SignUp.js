@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './SignUp.css';
+import { Link } from 'react-router-dom';
 
 import ROUTES from '../../routes';
 
@@ -120,18 +122,25 @@ const Signup = () => {
     };
 
     return (
-        <div>
-            <h2>Signup</h2>
-            <form onSubmit={handleSignup}>
-                <label>
-                    Username:
-                    <input required type="text" value={signupUsername} onChange={e => setSignupUsername(e.target.value)} />
-                </label>
-                <label>
-                    Password:
-                    <input required type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} />
-                </label>
-                <input type="submit" value="Submit" />
+        <div className='sign-up-page'>
+            <form class="form" onSubmit={handleSignup}>
+                <p class="form-title">User Sign Up</p>
+
+                <div class="input-container">
+                    <input required type="text" value={signupUsername} onChange={e => setSignupUsername(e.target.value)} placeholder='Username' />
+                </div>
+                <div class="input-container">
+                    <input required type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} placeholder='Password' />
+                </div>
+                <input type="submit" className='submit' value="Sign Up" />
+
+                <p class="signup-link">
+                    Already have an account?
+                    <Link className="login-button" to={ROUTES.login()}>
+                        Log In
+                    </Link>
+                </p>
+
             </form>
         </div>
     );

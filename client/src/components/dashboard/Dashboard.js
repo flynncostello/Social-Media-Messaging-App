@@ -4,10 +4,16 @@ import Friends from './friendsList/Friends';
 import NewFriend from './addNewFriend/NewFriend';
 import Chatroom from './chatroom/Chatroom';
 import FriendRequests from './friendRequests/FriendRequests';
+import axios from 'axios';
+import { API_ENDPOINT } from '../../api/index';
 
 import './Dashboard.css';
 
 const Dashboard = () => {
+    const getSessionInfo = async () => {
+        await axios.get(`${API_ENDPOINT}/sessionInfo`);
+    }
+
     return (
         <div className='dashboard'>
             {/* Left Column */}

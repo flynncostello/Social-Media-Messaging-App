@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
 import axios from 'axios';
 import userAPI from '../../api/user';
-
+import { Link } from 'react-router-dom';
+import './Login.css';
 import { API_ENDPOINT } from '../../api/index';
 
 // Socket originates in this file and is also used in Chatroom.js for sending real-time messages
@@ -66,18 +67,25 @@ const Login = () => {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <label>
-                    Username:
-                    <input required type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
-                </label>
-                <label>
-                    Password:
-                    <input required type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-                </label>
-                <input type="submit" value="Submit" />
+        <div className='login-page'>
+            <form class="form" onSubmit={handleLogin}>
+                <p class="form-title">User Log In</p>
+
+                <div class="input-container">
+                    <input required type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder='Username' />
+                </div>
+                <div class="input-container">
+                    <input required type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder='Password' />
+                </div>
+                <input type="submit" className='submit' value="Log In" />
+
+                <p class="signup-link">
+                    Don't have an account?
+                    <Link className="login-button" to={ROUTES.signup()}>
+                        Sign Up
+                    </Link>
+                </p>
+
             </form>
         </div>
     );

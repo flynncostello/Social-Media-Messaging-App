@@ -36,9 +36,9 @@ const NewFriendSearchResult = ({ id, username }) => {
     };
 
     return (
-        <div>
-            <span>{username}</span>
-            {!isAdded && <button onClick={handleAddFriend}>Add</button>}
+        <div className='new-friend-search-result-container'>
+            <p>{username}</p>
+            {!isAdded && <button onClick={handleAddFriend} className='new-friend-add-button'>Add</button>}
         </div>
     );
 };

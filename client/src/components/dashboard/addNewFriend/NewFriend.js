@@ -24,7 +24,7 @@ const NewFriend = () => {
             {showTab && (
                 <div className='new-friend-tab-container'>
                     <h2>Add New Friend</h2>
-                    <input type="text" placeholder="Search" value={searchValue} onChange={handleSearchChange} />
+                    <input className='add-friends-search-bar' type="text" placeholder="Search" value={searchValue} onChange={handleSearchChange} />
                     <div className='search-results'>
                         <NewFriendSearchResults searchValue={searchValue} />
                     </div>
