@@ -13,7 +13,7 @@ const Home = () => {
         {/* Logo */}
         <Link className="navbar-logo" to="/">
           <FontAwesomeIcon icon={faMessage} />
-          <span className="logo">FriendMessanger</span>
+          <span className="logo">FriendMessenger</span>
         </Link>
 
         {/* Buttons */}
@@ -29,9 +29,9 @@ const Home = () => {
 
       {/* Main Content */}
       <div className="home-page-main-text">
-        <h2>Welcome to FriendMessanger</h2>
+        <h2>Welcome to FriendMessenger</h2>
         <p>
-          FriendMessanger is a powerful messaging platform that allows you to stay connected with your friends and
+          FriendMessenger is a powerful messaging platform that allows you to stay connected with your friends and
           family. Join our community today and experience seamless communication like never before.
         </p>
         
@@ -51,7 +51,7 @@ const Home = () => {
 
       {/* Footer */}
       <footer className="home-page-footer">
-        <p>&copy; 2023 FriendMessanger. All rights reserved.</p>
+        <p>&copy; 2023 FriendMessenger. All rights reserved.</p>
       </footer>
 
     </div>

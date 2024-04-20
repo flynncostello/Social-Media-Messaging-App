@@ -27,6 +27,25 @@
     z-index: 10;
 }
 
+.dropdown button {
+    background-color: #4F46E5; /* Set background color of button */
+    color: white; /* Set text color of button */
+    border: none; /* Remove border from button */
+    border-radius: 5px; /* Add border radius to button */
+    padding: 8px 8px; /* Add padding to button */
+    font-size: 15px; /* Set font size of button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    text-align: center; /* Center text in button */
+    text-decoration: none; /* Remove default underline */
+    display: block; /* Make button block-level */
+    width: 100%; /* Set width of button */
+    margin-bottom: 5px;
+}
+
+.dropdown button:hover {
+    opacity: 0.7; /* Change opacity of button on hover */
+}
+
 .dropdown a {
     display: block; /* Make links block-level */
     color: #333; /* Set text color of links */

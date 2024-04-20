@@ -1,9 +1,74 @@
 .user-message {
     text-align: right;
+    padding: 5px 10px;
+    text-align: right;
+    background-color: rgb(248, 248, 248);
+    border-radius: 10px;
     color: rgb(0, 145, 255);
 }
 
 .friend-message {
     text-align: left;
     color: red;
+    padding: 5px 10px;
+    background-color: rgb(248, 248, 248);
+    border-radius: 10px;
+}
+
+.chatroom-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    justify-content: space-between;
+}
+
+.leave-chat-button {
+    align-self: flex-start;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    color: white;
+    background-color: gray;
+    cursor: pointer;
+}
+
+.leave-chat-button:hover {
+    opacity: 0.7;
+}
+
+.chats-container {
+    margin: 20px;
+    border: 0.5px solid gray;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+.input-chat-form {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
+.chat-input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+.chat-input-submit-button {
+    width: 10%;
+    padding: 10px;
+    margin-right: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #4F46E5;
+    color: white;
+    cursor: pointer;
 }

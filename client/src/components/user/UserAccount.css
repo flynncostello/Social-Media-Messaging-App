@@ -1,0 +1,22 @@
+.user-account-page {
+    display: flex;
+    align-items: top;
+    justify-content: flex-start;
+    flex-direction: column;
+    margin: 5vw;
+    padding: 40px;
+    border: 1px solid black;
+}
+
+.user-account-buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #4F46E5; /* Set background color of button */
+    color: white; /* Set text color of button */
+    border: none; /* Remove border from button */
+    border-radius: 5px; /* Add border radius to button */
+    font-size: 15px; /* Set font size of button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    text-align: center; /* Center text in button */
+    text-decoration: none; /* Remove default underline */
+}

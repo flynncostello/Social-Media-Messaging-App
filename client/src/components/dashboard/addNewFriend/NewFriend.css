@@ -17,7 +17,7 @@
 .new-friend-tab-container {
     position: absolute;
     top: 20px;
-    left: 300px; /* Position the tab 50px to the right of the icon */
+    left: 21vw; /* Position the tab 50px to the right of the icon */
     width: 200px;
     height: 450px;
     background-color: #fff;

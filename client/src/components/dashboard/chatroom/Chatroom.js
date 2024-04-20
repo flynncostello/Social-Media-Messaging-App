@@ -143,8 +143,7 @@ const Chatroom = () => {
     chatroom_id !== null ? (
       <div className='chatroom-container'>
           {/* Chatroom */}
-          <button onClick={handleLeaveChat}>Leave Chat</button>
-          <p>Entering Chatroom with id: {chatroom_id} and friendId: {chatroom_friend.id}</p>
+          <button className='leave-chat-button' onClick={handleLeaveChat}>Leave Chat</button>
           <div className='chats-container'>
             {chatroom_messages.length > 0 && [...chatroom_messages].sort((a, b) => a.chatroom_index - b.chatroom_index)
               .map((obj, index) => (
@@ -156,11 +155,12 @@ const Chatroom = () => {
           <form className='input-chat-form' onSubmit={handleSubmitMessage}>
             <input
               type='text'
+              className='chat-input'
               placeholder='Type a message...'
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <button type='submit'>Send</button>
+            <button className='chat-input-submit-button' type='submit'>Send</button>
           </form>
       </div>
     ) : (

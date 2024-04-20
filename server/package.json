@@ -16,7 +16,8 @@
     "pg": "^8.11.5",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
-    "bcrypt": "^5.0.1"
+    "bcrypt": "^5.0.1",
+    "dotenv": "16.4.5"
   },
   "scripts": {
     "start": "node src/server.js",

@@ -11,6 +11,7 @@ import { clearRequests } from '../../slices/friendRequestsSlice';
 import { resetChatroom } from '../../slices/chatroomSlice';
 
 import { API_ENDPOINT } from '../../api/index'
+import './UserAccount.css';
 
 /*
 Process:
@@ -69,8 +70,8 @@ const UserAccount = () => {
 };
 
   return (
-    <div>
-      <div>
+    <div className='user-account-page'>
+      <div className='user-info-container'>
         {/* User Information */}
         <h1>User Account</h1>
         <p>User ID: {user.id}</p>
@@ -78,7 +79,7 @@ const UserAccount = () => {
         {/* <p>Password: {user.password}</p> Not displaying password */}
         <p>Is Active: {user.is_active ? 'Yes' : 'No'}</p>
       </div>
-      <div>
+      <div className='user-account-buttons'>
         {/* Buttons */}
         <button onClick={handleDeleteAccount}>Delete Account</button>
         <button onClick={handleLogout}>Logout</button>
