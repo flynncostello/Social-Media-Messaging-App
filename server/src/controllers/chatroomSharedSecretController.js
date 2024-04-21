@@ -20,6 +20,7 @@ exports.createChatroomSharedSecret = async (req, res) => {
     }
 };
 
+
 exports.deleteChatroomSharedSecret = async (req, res) => {
     const chatroom_id = req.params.chatroomId;
     try {
