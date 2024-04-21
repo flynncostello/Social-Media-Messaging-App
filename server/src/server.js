@@ -177,9 +177,12 @@ app.post('/api/signup', async (req, res) => {
 app.get('/api/logout', (req, res) => {
   console.log("Users current session info: ", req.session);
   req.logout((err) => {
+    console.log("In req.logout")
     if (err) {
+      console.log("Error when loggin out")
       return res.json({ success: false, message: 'Error logging out' });
     }
+    console.log("Logged out successfully!!!")
     res.json({ success: true, message: 'Logged out successfully' });
   });
 });

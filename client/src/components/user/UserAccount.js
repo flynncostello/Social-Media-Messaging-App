@@ -31,6 +31,13 @@ const UserAccount = () => {
       try {
         await userAPI.deleteUser(user.id);
 
+        alert('Account deleted successfully!');
+        dispatch(clearUserSlice());
+        dispatch(clearFriendsSlice());
+        dispatch(clearRequests());
+        dispatch(resetChatroom());
+        navigate('/');
+
         const response = await axios.get(`${API_ENDPOINT}/logout`);
   
         if (response.data.success) {
@@ -54,16 +61,26 @@ const UserAccount = () => {
     e.preventDefault();
     try {
       userAPI.updateUser(user.id, { is_active: false })
+
+      alert('Logged out successfully!');                
+      dispatch(clearUserSlice()); // Clear user slice
+      dispatch(clearFriendsSlice()); // Clear friends slice
+      dispatch(clearRequests()); // Clear friend requests slice
+      dispatch(resetChatroom()); // Clear chatroom slice
+      navigate('/'); // Redirect to home page
+
       const response = await axios.get(`${API_ENDPOINT}/logout`);
-        if (response.data.success) {
-            alert('Logged out successfully!');
-            dispatch(clearUserSlice()); // Clear user slice
-            dispatch(clearFriendsSlice()); // Clear friends slice
-            navigate('/');
-        } else {
-            alert('Logout failed:', response.data.message);
-        }
-        // Also need to clear user slice - need to clear all slices
+      
+      if (response.data.success) {
+        alert('Logged out successfully!');                
+        dispatch(clearUserSlice()); // Clear user slice
+        dispatch(clearFriendsSlice()); // Clear friends slice
+        dispatch(clearRequests()); // Clear friend requests slice
+        dispatch(resetChatroom()); // Clear chatroom slice
+        navigate('/'); // Redirect to home page
+      } else {
+          alert('Logout failed:', response.data.message);
+      }
     } catch (error) {
         alert('Error: ' + error);
     }

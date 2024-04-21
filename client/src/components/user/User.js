@@ -44,10 +44,17 @@ const User = () => {
     const handleLogout = async (e) => {
         e.preventDefault();
         try {
-            userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
+            await userAPI.updateUser(user.id, { is_active: false }) // Update user's is_active status in database
+
+            alert('Logged out successfully!');                
+            dispatch(clearUserSlice()); // Clear user slice
+            dispatch(clearFriendsSlice()); // Clear friends slice
+            dispatch(clearRequests()); // Clear friend requests slice
+            dispatch(resetChatroom()); // Clear chatroom slice
+            navigate('/'); // Redirect to home page
 
             const response = await axios.get(`${API_ENDPOINT}/logout`);
-            
+
             if (response.data.success) {
                 alert('Logged out successfully!');                
                 dispatch(clearUserSlice()); // Clear user slice
